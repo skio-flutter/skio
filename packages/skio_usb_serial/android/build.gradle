@@ -1,0 +1,47 @@
+group = "dev.skio.usb_serial"
+version = "1.0"
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:9.1.0")
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // usb-serial-for-android is published on JitPack only.
+        maven {
+            url = "https://jitpack.io"
+            content { includeGroup("com.github.mik3y") }
+        }
+    }
+}
+
+apply plugin: "com.android.library"
+
+android {
+    namespace = "dev.skio.usb_serial"
+    compileSdk = 36
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    defaultConfig {
+        minSdk = 24
+        consumerProguardFiles("consumer-proguard-rules.pro")
+    }
+}
+
+dependencies {
+    // api (not implementation) so jnigen sees the classes on the example's
+    // compile classpath when regenerating bindings.
+    api("com.github.mik3y:usb-serial-for-android:3.11.0")
+}
