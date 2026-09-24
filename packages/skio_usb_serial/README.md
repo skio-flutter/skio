@@ -111,7 +111,7 @@ line settings, view text or hex, send text or hex, toggle DTR/RTS.
 | --- | --- |
 | `skio_core` | Shared types: access status, errors, device filters |
 | `skio_usb_serial` | USB serial port (this package) |
-| `uvc_camera` | USB Video Class camera |
+| `skio_uvc_camera` | USB Video Class camera |
 
 ## Licences
 

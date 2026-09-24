@@ -1,0 +1,23 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Android 9+ needs CAMERA to open USB video devices. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- The UVC library declares these for features skio_uvc_camera doesn't use.
+         Remove them so apps don't inherit them (MANAGE_EXTERNAL_STORAGE is
+         restricted on Google Play). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" tools:node="remove" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
+
+    <!-- Optional, so apps still install on phones without USB OTG or a
+         built-in camera. -->
+    <uses-feature
+        android:name="android.hardware.usb.host"
+        android:required="false"
+        tools:replace="android:required" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+</manifest>
