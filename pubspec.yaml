@@ -1,0 +1,11 @@
+name: skio_workspace
+description: Workspace root for the skio packages. Not published.
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - packages/skio_core
+  - packages/skio_usb_serial
+  - packages/skio_usb_serial/example

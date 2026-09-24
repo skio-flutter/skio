@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Read-only token by default; no job here needs to write.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check for private files and secrets
+        run: tool/check_private_files.sh --all
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve workspace
+        run: flutter pub get
+
+      - name: Format
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        run: dart analyze --fatal-infos
+
+      - name: Test
+        run: |
+          for pkg in packages/*/; do
+            echo "::group::test $pkg"
+            if grep -q 'sdk: flutter' "$pkg/pubspec.yaml"; then
+              (cd "$pkg" && flutter test)
+            else
+              (cd "$pkg" && dart test)
+            fi
+            echo "::endgroup::"
+          done
+
+      - name: Build serial example (web)
+        working-directory: packages/skio_usb_serial/example
+        run: flutter build web --release
+
+      - name: Publish dry-run
+        run: |
+          for pkg in packages/*/; do
+            echo "::group::dry-run $pkg"
+            (cd "$pkg" && flutter pub publish --dry-run)
+            echo "::endgroup::"
+          done

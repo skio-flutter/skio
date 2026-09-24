@@ -1,0 +1,21 @@
+name: skio_core
+description: >-
+  Shared pure-Dart types for the skio Flutter hardware plugins: permission
+  access status, a sealed hardware exception family and USB/BLE device filters.
+version: 0.1.0-dev
+repository: https://github.com/skio-flutter/skio/tree/main/packages/skio_core
+issue_tracker: https://github.com/skio-flutter/skio/issues
+topics:
+  - hardware
+  - usb
+  - bluetooth
+  - permissions
+  - iot
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.26.0

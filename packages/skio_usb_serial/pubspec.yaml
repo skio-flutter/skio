@@ -1,0 +1,41 @@
+name: skio_usb_serial
+description: >-
+  USB serial port for Flutter on Android (USB OTG) and web (Web Serial):
+  CP210x, CH340, FTDI, CDC-ACM. Direct JNI via jnigen, no platform channels.
+version: 0.1.0-dev
+repository: https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial
+issue_tracker: https://github.com/skio-flutter/skio/issues
+topics:
+  - usb
+  - serial-port
+  - web-serial
+  - android
+  - hardware
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  meta: ^1.16.0
+  skio_core: ^0.1.0-dev
+  web: ^1.1.1
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        ffiPlugin: true
+      web:
+        pluginClass: UsbSerialWeb
+        fileName: src/web/usb_serial_web.dart
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter

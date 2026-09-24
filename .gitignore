@@ -1,0 +1,54 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+build/
+pubspec_overrides.yaml
+.flutter-plugins
+.flutter-plugins-dependencies
+coverage/
+doc/api/
+
+# Android
+**/android/local.properties
+**/android/.gradle/
+**/android/captures/
+**/android/key.properties
+*.jks
+*.keystore
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Secrets must never be committed
+.env
+.env.*
+*.pem
+*.p12
+
+# ---- Private files: never pushed ----
+# Anything you want to keep local goes in private/ (design notes, customer
+# data, device logs, screenshots, etc.).
+private/
+*.private.*
+*.local
+*.local.*
+
+# Credentials and signing
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+**/macos/Runner/GoogleService-Info.plist
+*.mobileprovision
+*.p8
+*.key
+*.keystore.properties
+credentials.json
+pub-credentials.json
+service-account*.json
+
+# Captures from real devices (may contain personal data)
+captures/
+*.hprof
+
