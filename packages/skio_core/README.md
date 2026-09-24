@@ -44,6 +44,6 @@ try {
 | --- | --- |
 | `skio_core` | Shared types (this package) |
 | `skio_usb_serial` | USB serial port: Android USB OTG, Web Serial |
-| `uvc_camera` | USB Video Class camera on Android |
+| `skio_uvc_camera` | USB Video Class camera on Android |
 
 Source and issues: [github.com/skio-flutter/skio](https://github.com/skio-flutter/skio).

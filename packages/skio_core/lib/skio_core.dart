@@ -1,6 +1,6 @@
 /// Shared types for the skio hardware plugins.
 ///
-/// The skio plugins (`skio_usb_serial`, `uvc_camera`) re-export this library,
+/// The skio plugins (`skio_usb_serial`, `skio_uvc_camera`) re-export this library,
 /// so apps handle permissions, errors and device matching the same way for
 /// every device.
 library;
