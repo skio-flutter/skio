@@ -1,3 +1,9 @@
+## 0.1.1
+
+- README: badges, a FAQ for common questions and a fair comparison with
+  other packages.
+- pub.dev: clearer description, topics and a link to skio-flutter.dev.
+
 ## 0.1.0
 
 First stable release.

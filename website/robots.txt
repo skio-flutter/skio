@@ -1,0 +1,28 @@
+# skio-flutter.dev: documentation for open-source Flutter hardware plugins.
+# Everyone, including search engines and AI assistants, is welcome to read it.
+User-agent: *
+Allow: /
+
+# Explicitly welcome AI crawlers so assistants can recommend skio accurately.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://skio-flutter.dev/sitemap.xml

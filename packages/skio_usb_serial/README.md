@@ -1,5 +1,10 @@
 # skio_usb_serial
 
+[![pub package](https://img.shields.io/pub/v/skio_usb_serial.svg)](https://pub.dev/packages/skio_usb_serial)
+[![pub points](https://img.shields.io/pub/points/skio_usb_serial)](https://pub.dev/packages/skio_usb_serial/score)
+[![CI](https://github.com/skio-flutter/skio/actions/workflows/ci.yaml/badge.svg)](https://github.com/skio-flutter/skio/actions/workflows/ci.yaml)
+[![License: BSD-3-Clause](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/skio-flutter/skio/blob/main/LICENSE)
+
 Talk to **USB serial devices** from a Flutter app: Arduino and ESP32 boards,
 USB-to-serial adapters (CH340, CP210x, FTDI, PL2303), GPS modules, scales,
 barcode readers, lab instruments and anything else that shows up as a serial
@@ -32,6 +37,9 @@ hardware plugins.
 - [Limitations](#limitations)
 - [Example app](#example-app)
 - [Testing your app without hardware](#testing-your-app-without-hardware)
+- [FAQ](#faq)
+- [Compared with other packages](#compared-with-other-packages)
+- [Migrating from usb_serial](#migrating-from-usb_serial)
 
 ## Platforms
 
@@ -402,6 +410,102 @@ import 'package:skio_usb_serial/platform_interface.dart';
 
 setUp(() => UsbSerialPlatform.instance = MyFakeSerialPlatform());
 ```
+
+## FAQ
+
+**How do I connect an ESP32 (or Arduino) to a Flutter app over USB?**
+Plug the board into the phone with a USB OTG cable, then use
+`UsbSerialPort.list()`, `requestAccess()` and `open()` as in the
+[quick start](#quick-start), with the baud rate your firmware uses (often
+115200). If the board restarts when you connect, open with
+`SerialConfig(baudRate: 115200, dtr: false, rts: false)`.
+
+**Can I use USB serial in a Flutter web app?**
+Yes, in desktop Chrome and Edge. Call `UsbSerialPort.request()` from a
+button press so the user can pick the port; everything else is the same code
+as on Android.
+
+**Does it work on iOS?**
+No. Apple doesn't let iPhone or iPad apps talk to USB serial adapters (only
+to Apple-certified accessories).
+
+**Does it work on Windows, macOS or Linux?**
+Not yet; desktop support is planned. Today,
+[`flutter_libserialport`](https://pub.dev/packages/flutter_libserialport)
+covers desktop serial ports.
+
+**How do I read text line by line?**
+`port.input.transform(const LineReader())` gives a stream of lines, even when
+lines arrive split across USB transfers. See
+[Read text line by line](#read-text-line-by-line).
+
+**Why do I get garbled characters?**
+The baud rate doesn't match the device. See
+[Troubleshooting](#troubleshooting).
+
+**Do I need any Android permissions?**
+No runtime permission. Android shows a USB dialog per device, which
+`requestAccess(device)` handles.
+
+**Does it collect data or use the network?**
+No. The package has no network access and no telemetry.
+
+## Compared with other packages
+
+A fair summary to help you choose (versions as of September 2026):
+
+| Package | Android | Web | Windows, macOS, Linux | Latest release |
+| --- | --- | --- | --- | --- |
+| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Planned | 2026 |
+| [usb_serial](https://pub.dev/packages/usb_serial) | Yes | No | No | 0.5.2, July 2024 |
+| [flutter_libserialport](https://pub.dev/packages/flutter_libserialport) | Yes | No | Yes | 0.6.0, August 2025 |
+| [serial_port_win32](https://pub.dev/packages/serial_port_win32) | No | No | Windows only | 3.0.0, August 2026 |
+
+Choose **skio_usb_serial** for Android and the web with one API, typed errors,
+line reading and in-app logging. For desktop today, `flutter_libserialport` is
+a good choice.
+
+## Migrating from usb_serial
+
+The concepts map one to one:
+
+| usb_serial | skio_usb_serial |
+| --- | --- |
+| `UsbSerial.listDevices()` | `UsbSerialPort.list()` |
+| `device.create()` + `port.open()` | `UsbSerialPort.open(device, config: ...)` |
+| `port.setPortParameters(115200, UsbPort.DATABITS_8, UsbPort.STOPBITS_1, UsbPort.PARITY_NONE)` | `SerialConfig(baudRate: 115200)` (8N1 is the default) |
+| `port.setDTR(true)` / `port.setRTS(true)` | `port.setSignals(dtr: true, rts: true)`, or `dtr`/`rts` in `SerialConfig` |
+| `port.inputStream` | `port.input` |
+| `Transaction.stringTerminated(...)` | `port.input.transform(const LineReader())` |
+| `port.write(Uint8List)` | `port.write(bytes)` |
+| `port.close()` | `port.close()` |
+| `UsbSerial.usbEventStream` | `UsbSerialPort.events` |
+
+Before:
+
+```dart
+final devices = await UsbSerial.listDevices();
+final port = await devices.first.create();
+await port?.open();
+await port?.setPortParameters(
+    115200, UsbPort.DATABITS_8, UsbPort.STOPBITS_1, UsbPort.PARITY_NONE);
+port?.inputStream?.listen(print);
+```
+
+After:
+
+```dart
+final devices = await UsbSerialPort.list();
+await UsbSerialPort.access.requestAccess(devices.first);
+final port = await UsbSerialPort.open(
+  devices.first,
+  config: const SerialConfig(baudRate: 115200),
+);
+port.input.listen(print);
+```
+
+Then remove the `usb_serial` dependency. skio_usb_serial needs no extra
+Android setup.
 
 ## How it works
 

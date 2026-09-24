@@ -3,8 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>skio: Flutter hardware plugins</title>
-<meta name="description" content="skio is a family of open-source Flutter plugins for USB serial devices and UVC cameras, using direct native bindings instead of platform channels.">
+<title>skio: Flutter plugins for USB serial and USB cameras</title>
+<meta name="description" content="Open-source Flutter plugins for USB hardware on Android and the web: skio_usb_serial for ESP32, STM32, Arduino and USB-serial adapters, and skio_uvc_camera for USB cameras, endoscopes and microscopes.">
+<link rel="canonical" href="https://skio-flutter.dev/">
+<meta name="keywords" content="Flutter USB serial, Flutter serial port, Flutter ESP32, Flutter STM32, Flutter Arduino, Flutter USB camera, Flutter UVC, Flutter endoscope, Web Serial Flutter, USB OTG Flutter">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="skio">
+<meta property="og:title" content="skio: Flutter plugins for real hardware">
+<meta property="og:description" content="USB serial and USB cameras in Flutter, on Android and the web. Direct native bindings, no platform channels.">
+<meta property="og:url" content="https://skio-flutter.dev/">
+<meta property="og:image" content="https://skio-flutter.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="skio: Flutter plugins for real hardware. skio_usb_serial, skio_uvc_camera, skio_core.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="skio: Flutter plugins for real hardware">
+<meta name="twitter:description" content="USB serial and USB cameras in Flutter, on Android and the web.">
+<meta name="twitter:image" content="https://skio-flutter.dev/og.png">
+<link rel="alternate" type="text/plain" title="LLM-friendly summary" href="https://skio-flutter.dev/llms.txt">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://skio-flutter.dev/#site", "name": "skio", "url": "https://skio-flutter.dev/", "description": "Open-source Flutter plugins for USB hardware on Android and the web: skio_usb_serial for ESP32, STM32, Arduino and USB-serial adapters, and skio_uvc_camera for USB cameras, endoscopes and microscopes."}, {"@type": "Organization", "@id": "https://skio-flutter.dev/#publisher", "name": "skio", "url": "https://skio-flutter.dev/", "logo": "https://skio-flutter.dev/og.png", "sameAs": ["https://github.com/skio-flutter", "https://pub.dev/publishers/skio-flutter.dev/packages"]}, {"@type": "SoftwareSourceCode", "name": "skio_usb_serial", "description": "Flutter plugin for USB serial ports on Android (USB OTG) and the web (Web Serial): ESP32, STM32, Nordic, Arduino, CH340, CP210x, FTDI, PL2303, CDC-ACM.", "url": "https://pub.dev/packages/skio_usb_serial", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, Web", "license": "https://opensource.org/licenses/BSD-3-Clause"}, {"@type": "SoftwareSourceCode", "name": "skio_uvc_camera", "description": "Flutter plugin for USB (UVC) cameras on Android and the web: live preview, JPEG capture, the camera's snapshot button and resolution choice.", "url": "https://pub.dev/packages/skio_uvc_camera", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_uvc_camera", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, Web", "license": "https://opensource.org/licenses/BSD-3-Clause"}, {"@type": "SoftwareSourceCode", "name": "skio_core", "description": "Shared Dart types for the skio plugins: permissions, error types, device filters and opt-in logging.", "url": "https://pub.dev/packages/skio_core", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_core", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, iOS, Web, Windows, macOS, Linux", "license": "https://opensource.org/licenses/BSD-3-Clause"}]}</script>
 <meta name="color-scheme" content="light dark">
 <script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 <meta name="theme-color" content="#0b0f0e" media="(prefers-color-scheme: dark)">
@@ -716,6 +733,7 @@ cam.buttonPresses.<span class="f">listen</span>((_) =&gt; cam.<span class="f">ca
       <a href="https://github.com/skio-flutter/skio">GitHub</a>
       <a href="https://pub.dev/publishers/skio-flutter.dev/packages">pub.dev</a>
       <a href="https://github.com/skio-flutter/skio/security/advisories/new">Report a security issue</a>
+      <a href="/llms.txt">llms.txt</a>
       <a href="mailto:hello@skio-flutter.dev">hello@skio-flutter.dev</a>
     </nav>
   </footer>

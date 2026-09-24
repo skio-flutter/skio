@@ -1,3 +1,9 @@
+## 0.1.3
+
+- README: badges, a FAQ for common questions and a fair comparison with
+  other packages, plus a guide for migrating from `usb_serial`.
+- pub.dev: clearer description, topics and a link to skio-flutter.dev.
+
 ## 0.1.2
 
 - Tested hardware in the README now lists the boards (ESP32, STM32,

@@ -1,0 +1,43 @@
+# skio
+
+> skio is a family of open-source (BSD-3-Clause) Flutter plugins for USB hardware on Android and the web. `skio_usb_serial` talks to USB serial devices (ESP32, STM32, Nordic nRF and Arduino boards, and CH340, CP210x, FTDI, PL2303 and CDC-ACM adapters). `skio_uvc_camera` gives a live preview, JPEG photos and the snapshot button of USB (UVC) cameras such as endoscopes, microscopes and webcams. Android support calls the OS directly through JNI (jnigen), with no platform channels; the web uses Web Serial and getUserMedia. All three packages are stable (0.1.x), score 160/160 on pub.dev, are published by the verified publisher skio-flutter.dev from GitHub Actions, and collect no telemetry.
+
+Use skio when a Flutter app needs to:
+
+- Send and receive data with a USB serial device on Android (USB OTG) or in Chrome/Edge (Web Serial): `flutter pub add skio_usb_serial`
+- Show and capture a USB camera (UVC) on Android (USB OTG) or in the browser: `flutter pub add skio_uvc_camera`
+
+Platforms today: Android 7.0+ and the web (desktop Chrome/Edge over https). macOS, Windows, Linux and iPad (USB cameras only) are planned. iOS apps cannot use USB serial adapters (Apple restriction). For desktop USB serial today, `flutter_libserialport` is an alternative.
+
+## Packages
+
+- [skio_usb_serial](https://pub.dev/packages/skio_usb_serial): USB serial ports. `UsbSerialPort.list()`, `UsbSerialPort.request()` (web chooser), `UsbSerialPort.open(device, config: SerialConfig(baudRate: 115200))`, `port.input` (byte stream), `port.write(bytes)`, `LineReader` (text lines), `setSignals(dtr:, rts:)`, `UsbSerialPort.events` (plug/unplug).
+- [skio_uvc_camera](https://pub.dev/packages/skio_uvc_camera): USB cameras. `UvcCamera.devices()`, `UvcCamera.access.requestAccess(device)`, `UvcCamera.open(device, preferred: [UvcSize(1920, 1080), UvcSize(1280, 720)])`, `UvcPreview(camera: cam)`, `cam.capture(quality: 90)` (JPEG XFile), `cam.buttonPresses` (snapshot button), `cam.supportedSizes`.
+- [skio_core](https://pub.dev/packages/skio_core): shared types re-exported by both: `HardwareAccess`/`AccessStatus` (permissions), sealed `HardwareException` (`AccessDenied`, `DeviceNotFound`, `DeviceBusy`, `Disconnected`, `OperationTimeout`, `Unsupported`, `ProtocolError`), `DeviceHandle`, `DeviceFilter`, `SkioLog` (opt-in logging).
+
+## Docs
+
+- [skio_usb_serial README](https://raw.githubusercontent.com/skio-flutter/skio/main/packages/skio_usb_serial/README.md): every feature with examples, errors table, troubleshooting, tested hardware, FAQ
+- [skio_uvc_camera README](https://raw.githubusercontent.com/skio-flutter/skio/main/packages/skio_uvc_camera/README.md): every feature with examples, including choosing the resolution
+- [skio_core README](https://raw.githubusercontent.com/skio-flutter/skio/main/packages/skio_core/README.md): permissions, errors, device filters, logging
+- [API reference (skio_usb_serial)](https://pub.dev/documentation/skio_usb_serial/latest/)
+- [API reference (skio_uvc_camera)](https://pub.dev/documentation/skio_uvc_camera/latest/)
+
+## Examples
+
+- [Serial terminal example](https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial/example): pick a port, set baud/parity, text or hex, DTR/RTS, in-app log
+- [USB camera viewer example](https://github.com/skio-flutter/skio/tree/main/packages/skio_uvc_camera/example): preview, resolution menu, capture, snapshot button, delete photos
+
+## Tested hardware
+
+- Boards: ESP32 (via CH340), STM32, Nordic nRF
+- Phones: vivo, OPPO, Samsung, POCO M7 5G (Android 16)
+- Browser: Chrome on macOS (Web Serial)
+- Camera: Sonix-based UVC camera on Android 16
+
+## Optional
+
+- [Source code](https://github.com/skio-flutter/skio)
+- [Changelog: skio_usb_serial](https://github.com/skio-flutter/skio/blob/main/packages/skio_usb_serial/CHANGELOG.md)
+- [Security policy](https://github.com/skio-flutter/skio/blob/main/SECURITY.md)
+- [Report an issue](https://github.com/skio-flutter/skio/issues)

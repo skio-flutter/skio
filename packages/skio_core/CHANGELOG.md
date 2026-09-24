@@ -1,3 +1,8 @@
+## 0.1.2
+
+- README badges; clearer pub.dev description and a link to
+  skio-flutter.dev.
+
 ## 0.1.1
 
 - README rewritten to explain every part in plain words: permissions,
