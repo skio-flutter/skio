@@ -34,6 +34,7 @@ try {
 | `HardwareException` (sealed) | `AccessDenied`, `DeviceNotFound`, `DeviceBusy`, `Disconnected`, `OperationTimeout`, `Unsupported`, `ProtocolError` |
 | `AccessConfigurationError` | A developer error that names the exact manifest or config change to make |
 | `DeviceHandle`, `DeviceFilter`, `DeviceEvent` | Device identity, declarative matching and attach/detach events |
+| `SkioLog`, `LogLevel`, `LogRecord` | Opt-in logging shared by all skio packages, silent by default |
 
 ## The skio family
 

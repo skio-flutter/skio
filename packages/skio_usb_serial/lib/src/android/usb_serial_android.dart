@@ -81,6 +81,12 @@ final class AndroidUsbSerialPlatform extends UsbSerialPlatform {
       );
       _usb.requestPermission$1(found.usbDevice, pending);
       final granted = await _waitForPermission(found.usbDevice);
+      SkioLog.log(
+        LogLevel.info,
+        'skio_usb_serial',
+        () => 'USB permission ${granted ? 'granted' : 'denied'}',
+        device: device,
+      );
       pending?.release();
       intent.release();
       return granted
@@ -484,6 +490,12 @@ final class _AndroidSerialConnection implements SerialConnection {
           throw Disconnected('Write failed', device: _device, cause: e.message);
         }
         // Buffer full: the device is slower than the app. Wait for room.
+        SkioLog.log(
+          LogLevel.debug,
+          'skio_usb_serial',
+          () => 'Write buffer full, retrying',
+          device: _device,
+        );
         if (DateTime.now().isAfter(deadline)) {
           throw OperationTimeout(
             'The device did not accept data in time',

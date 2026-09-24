@@ -8,3 +8,4 @@ library;
 export 'src/access.dart';
 export 'src/device.dart';
 export 'src/exceptions.dart';
+export 'src/log.dart';

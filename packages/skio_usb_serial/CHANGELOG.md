@@ -12,4 +12,6 @@
   on multi-port adapters), USB permission dialog without a BroadcastReceiver,
   attach/detach events, line settings, flow control, DTR/RTS, non-blocking
   writes on the library's I/O thread, R8 keep rules included.
+- Opt-in logging through `SkioLog`: open/close, errors, permission results
+  and hex dumps of every byte at `trace`.
 - Example app: general-purpose serial terminal.
