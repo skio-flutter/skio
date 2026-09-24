@@ -8,7 +8,7 @@ issue_tracker: https://github.com/skio-flutter/skio/issues
 topics:
   - hardware
   - usb
-  - bluetooth
+  - serial-port
   - permissions
   - iot
 

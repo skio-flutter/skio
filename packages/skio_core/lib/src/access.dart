@@ -60,7 +60,7 @@ final class AccessReport {
 ///
 /// Access is device-scoped because some platforms grant permission per
 /// attached device (Android USB). Pass `null` to check the capability as a
-/// whole, for example Bluetooth scanning.
+/// whole.
 abstract interface class HardwareAccess {
   /// Returns the current access state without showing any prompt.
   Future<AccessReport> checkAccess([DeviceHandle? device]);

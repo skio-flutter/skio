@@ -53,7 +53,6 @@ UsbSerialPlatform.instance = MyFakePlatform();
 | --- | --- |
 | `skio_core` | Shared types: access status, errors, device filters |
 | `skio_usb_serial` | USB serial port (this package) |
-| `skio_uvc_camera` | USB Video Class camera |
-| `skio_ble_central` | Bluetooth LE central |
+| `uvc_camera` | USB Video Class camera |
 
 Source and issues: [github.com/skio-flutter/skio](https://github.com/skio-flutter/skio).
