@@ -2693,6 +2693,37 @@ extension SerialInputOutputManager$$Methods on SerialInputOutputManager {
     ).check();
   }
 
+  static final _id_set$writeBufferSize = SerialInputOutputManager._class
+      .instanceMethodId(r'setWriteBufferSize', r'(I)V');
+
+  static final _set$writeBufferSize =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JThrowablePtr Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<(jni$_.Int32,)>,
+              )
+            >
+          >('globalEnv_CallVoidMethod')
+          .asFunction<
+            jni$_.JThrowablePtr Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              core$_.int,
+            )
+          >();
+
+  /// from: `public void setWriteBufferSize(int i)`
+  set writeBufferSize(core$_.int i) {
+    final _$$selfRef = reference;
+    _set$writeBufferSize(
+      _$$selfRef.pointer,
+      _id_set$writeBufferSize.pointer,
+      i,
+    ).check();
+  }
+
   static final _id_writeAsync = SerialInputOutputManager._class
       .instanceMethodId(r'writeAsync', r'([B)V');
 

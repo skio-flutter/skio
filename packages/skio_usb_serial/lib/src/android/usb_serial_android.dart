@@ -189,9 +189,14 @@ final class AndroidUsbSerialPlatform extends UsbSerialPlatform {
     controller = StreamController<DeviceEvent>.broadcast(
       onListen: () async {
         known = {for (final d in await list()) d.id: d};
+        // The listener may have cancelled while the first list() ran.
+        if (!controller.hasListener) return;
         timer = Timer.periodic(pollInterval, (_) => unawaited(poll()));
       },
-      onCancel: () => timer?.cancel(),
+      onCancel: () {
+        timer?.cancel();
+        timer = null;
+      },
     );
     return controller.stream;
   }
@@ -295,7 +300,9 @@ final class AndroidUsbSerialPlatform extends UsbSerialPlatform {
     try {
       port.open(connection);
     } on JThrowable catch (e) {
-      connection.close();
+      connection
+        ..close()
+        ..release();
       found.release();
       throw DeviceBusy(
         'The port could not be opened. Another app may be using it.',
@@ -321,17 +328,26 @@ final class AndroidUsbSerialPlatform extends UsbSerialPlatform {
         },
       );
       if (config.flowControl != FlowControl.none) {
-        port.setFlowControl(switch (config.flowControl) {
+        final mode = switch (config.flowControl) {
           FlowControl.none => a.UsbSerialPort$FlowControl.NONE,
           FlowControl.rtsCts => a.UsbSerialPort$FlowControl.RTS_CTS,
           FlowControl.dtrDsr => a.UsbSerialPort$FlowControl.DTR_DSR,
           FlowControl.xonXoff => a.UsbSerialPort$FlowControl.XON_XOFF_INLINE,
-        });
+        };
+        try {
+          port.setFlowControl(mode);
+        } finally {
+          mode.release();
+        }
       }
       if (config.dtr case final dtr?) port.setDTR(dtr);
       if (config.rts case final rts?) port.setRTS(rts);
     } on JThrowable catch (e) {
-      port.close();
+      try {
+        port.close();
+      } on JThrowable {
+        // Closing after a failed setup can fail too; nothing more to do.
+      }
       found.release();
       throw Unsupported(
         'This adapter does not support $config.',
@@ -339,6 +355,8 @@ final class AndroidUsbSerialPlatform extends UsbSerialPlatform {
         cause: e.message,
       );
     }
+    // The port keeps its own Java reference to the connection.
+    connection.release();
     found.releaseAllButPort();
     return _AndroidSerialConnection(port, device)..start();
   }
@@ -389,6 +407,7 @@ final class _AndroidSerialConnection implements SerialConnection {
       // A non-zero read timeout avoids the per-read status check that some
       // phones time out on, which the library reports as a disconnect.
       ..readTimeout = 1000
+      ..writeBufferSize = _writeBufferSize
       ..start();
   }
 
@@ -410,36 +429,72 @@ final class _AndroidSerialConnection implements SerialConnection {
   }
 
   void _onRunError(a.Exception? error) {
-    final message = error?.toString();
+    final message = error?.toString() ?? '';
     error?.release();
     if (_closed) return;
+    // The library stops its I/O threads after any error, so the port is
+    // unusable either way; the error type tells the app why.
     _input.addError(
-      Disconnected(
-        'The device was disconnected or stopped responding.',
-        device: _device,
-        cause: message,
-      ),
+      message.contains('SerialTimeoutException')
+          ? OperationTimeout(
+              'The device did not accept data in time',
+              timeout: Duration.zero,
+              device: _device,
+              cause: message,
+            )
+          : Disconnected(
+              'The device was disconnected or stopped responding.',
+              device: _device,
+              cause: message,
+            ),
     );
     unawaited(close());
   }
 
+  /// Size of the library's write buffer. Its default is 4 KB.
+  static const _writeBufferSize = 64 * 1024;
+
+  /// Largest piece handed to the library at once; must fit the buffer.
+  static const _chunkSize = 16 * 1024;
+
+  /// Writes by queueing data to the library's write thread, so the UI thread
+  /// never blocks on USB. The library's buffer is fixed-size and throws when
+  /// full, so data is queued in chunks and retried until [timeout] passes.
+  /// Errors on the write thread itself arrive through [_onRunError].
   @override
   Future<void> write(Uint8List data, Duration timeout) async {
-    final io = _io;
-    if (_closed || io == null) {
-      throw Disconnected('Port is closed', device: _device);
-    }
-    final bytes = JByteArray.of(data);
-    try {
-      io
-        ..writeTimeout = timeout.inMilliseconds
-        // Queued to the library's write thread so the UI thread never blocks
-        // on USB. Failures arrive through onRunError as Disconnected.
-        ..writeAsync(bytes);
-    } on JThrowable catch (e) {
-      throw Disconnected('Write failed', device: _device, cause: e.message);
-    } finally {
-      bytes.release();
+    final deadline = DateTime.now().add(timeout);
+    var offset = 0;
+    while (offset < data.length) {
+      final io = _io;
+      if (_closed || io == null) {
+        throw Disconnected('Port is closed', device: _device);
+      }
+      final end = offset + _chunkSize < data.length
+          ? offset + _chunkSize
+          : data.length;
+      final chunk = JByteArray.of(Uint8List.sublistView(data, offset, end));
+      try {
+        io
+          ..writeTimeout = timeout.inMilliseconds
+          ..writeAsync(chunk);
+        offset = end;
+      } on JThrowable catch (e) {
+        if (!e.message.contains('BufferOverflowException')) {
+          throw Disconnected('Write failed', device: _device, cause: e.message);
+        }
+        // Buffer full: the device is slower than the app. Wait for room.
+        if (DateTime.now().isAfter(deadline)) {
+          throw OperationTimeout(
+            'The device did not accept data in time',
+            timeout: timeout,
+            device: _device,
+          );
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+      } finally {
+        chunk.release();
+      }
     }
   }
 

@@ -77,6 +77,7 @@ const _allow = <String, Set<String>>{
     '<init>',
     'setReadTimeout',
     'setWriteTimeout',
+    'setWriteBufferSize',
     'setReadBufferSize',
     'writeAsync',
     'start',
