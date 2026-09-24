@@ -6,6 +6,8 @@ import 'package:skio_core/skio_core.dart';
 import 'platform/usb_serial_platform.dart';
 import 'serial_config.dart';
 
+const _source = 'skio_usb_serial';
+
 /// An open USB serial port.
 ///
 /// ```dart
@@ -24,7 +26,7 @@ import 'serial_config.dart';
 final class UsbSerialPort {
   UsbSerialPort._(this.device, this.config, this._connection) {
     _subscription = _connection.input.listen(
-      _input.add,
+      _onData,
       onError: _onConnectionError,
       onDone: () => unawaited(_shutDown()),
     );
@@ -83,7 +85,25 @@ final class UsbSerialPort {
     Duration writeTimeout = const Duration(seconds: 2),
   }) async {
     config.validate();
-    final connection = await _platform.open(device, config);
+    final SerialConnection connection;
+    try {
+      connection = await _platform.open(device, config);
+    } on Object catch (e) {
+      SkioLog.log(
+        LogLevel.warning,
+        _source,
+        () => 'Open failed',
+        device: device,
+        error: e,
+      );
+      rethrow;
+    }
+    SkioLog.log(
+      LogLevel.info,
+      _source,
+      () => 'Opened with $config',
+      device: device,
+    );
     final port = UsbSerialPort._(device, config, connection)
       .._writeTimeout = writeTimeout;
     if (openDelay > Duration.zero) await Future<void>.delayed(openDelay);
@@ -130,6 +150,12 @@ final class UsbSerialPort {
   Future<void> write(List<int> data, {Duration? timeout}) {
     _ensureOpen();
     final bytes = data is Uint8List ? data : Uint8List.fromList(data);
+    SkioLog.log(
+      LogLevel.trace,
+      _source,
+      () => 'TX ${bytes.length}: ${SkioLog.hex(bytes)}',
+      device: device,
+    );
     final result = _writeQueue.then(
       (_) => _connection.write(bytes, timeout ?? _writeTimeout),
     );
@@ -141,6 +167,12 @@ final class UsbSerialPort {
   /// Sets the DTR and RTS modem control lines. `null` leaves a line unchanged.
   Future<void> setSignals({bool? dtr, bool? rts}) {
     _ensureOpen();
+    SkioLog.log(
+      LogLevel.debug,
+      _source,
+      () => 'Signals dtr=$dtr rts=$rts',
+      device: device,
+    );
     return _connection.setSignals(dtr: dtr, rts: rts);
   }
 
@@ -151,10 +183,27 @@ final class UsbSerialPort {
     if (!_open) throw Disconnected('Port is closed', device: device);
   }
 
+  void _onData(Uint8List bytes) {
+    SkioLog.log(
+      LogLevel.trace,
+      _source,
+      () => 'RX ${bytes.length}: ${SkioLog.hex(bytes)}',
+      device: device,
+    );
+    _input.add(bytes);
+  }
+
   void _onConnectionError(Object error, StackTrace stackTrace) {
     final e = error is HardwareException
         ? error
         : Disconnected('Serial port failed', device: device, cause: error);
+    SkioLog.log(
+      LogLevel.warning,
+      _source,
+      () => e.message,
+      device: device,
+      error: e.cause,
+    );
     _input.addError(e, stackTrace);
     unawaited(_shutDown());
   }
@@ -162,6 +211,7 @@ final class UsbSerialPort {
   Future<void> _shutDown() async {
     if (!_open) return _done.future;
     _open = false;
+    SkioLog.log(LogLevel.info, _source, () => 'Closed', device: device);
     try {
       await _subscription.cancel();
       await _connection.close();

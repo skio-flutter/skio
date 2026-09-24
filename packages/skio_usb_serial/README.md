@@ -74,6 +74,19 @@ gesture.
 | No ports on Android | The phone needs USB OTG, and some need OTG enabled in settings. Try a powered hub for boards that draw more current. |
 | Chooser doesn't open on the web | `request()` wasn't called from a user gesture, or the page isn't https/localhost. |
 
+## Debug logging
+
+Logging is off by default. Turn it on to see opens, closes, errors and, at
+`trace`, every byte sent and received:
+
+```dart
+SkioLog.level = LogLevel.trace;
+SkioLog.records.listen(print);
+// 2026-09-24T10:15:02.114 TRACE skio_usb_serial [/dev/bus/usb/001/002]: RX 5: 4f 4b 0d 0a 3e
+```
+
+Attach this output to bug reports. Nothing is sent anywhere by skio.
+
 ## Testing your app without hardware
 
 ```dart

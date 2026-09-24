@@ -154,6 +154,30 @@ void main() {
     await expectLater(UsbSerialPort.request(), throwsA(isA<Unsupported>()));
   });
 
+  test('logs open, TX, RX and close at trace level', () async {
+    final records = <LogRecord>[];
+    final sub = SkioLog.records.listen(records.add);
+    SkioLog.level = LogLevel.trace;
+    addTearDown(() async {
+      SkioLog.level = LogLevel.off;
+      await sub.cancel();
+    });
+    final port = await UsbSerialPort.open(cp2102, config: config);
+    port.input.listen((_) {});
+    await port.write([0x41, 0x0a]);
+    platform.opened.single.receive([0x4f, 0x4b]);
+    await pumpEventQueue();
+    await port.close();
+    await pumpEventQueue();
+    expect(records.map((r) => r.message), [
+      'Opened with SerialConfig(115200 8N1, flow: none)',
+      'TX 2: 41 0a',
+      'RX 2: 4f 4b',
+      'Closed',
+    ]);
+    expect(records.every((r) => r.device == cp2102), isTrue);
+  });
+
   test('works end to end with LineReader', () async {
     final port = await UsbSerialPort.open(cp2102, config: config);
     final lines = port.input.transform(const LineReader()).toList();
