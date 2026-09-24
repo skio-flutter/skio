@@ -1,5 +1,10 @@
 # skio_core
 
+[![pub package](https://img.shields.io/pub/v/skio_core.svg)](https://pub.dev/packages/skio_core)
+[![pub points](https://img.shields.io/pub/points/skio_core)](https://pub.dev/packages/skio_core/score)
+[![CI](https://github.com/skio-flutter/skio/actions/workflows/ci.yaml/badge.svg)](https://github.com/skio-flutter/skio/actions/workflows/ci.yaml)
+[![License: BSD-3-Clause](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/skio-flutter/skio/blob/main/LICENSE)
+
 The shared building blocks of the [skio](https://github.com/skio-flutter/skio)
 Flutter hardware plugins. It gives every skio package **the same way to ask
 for permission, the same error types, the same way to pick devices, and the

@@ -1,5 +1,10 @@
 # skio_uvc_camera
 
+[![pub package](https://img.shields.io/pub/v/skio_uvc_camera.svg)](https://pub.dev/packages/skio_uvc_camera)
+[![pub points](https://img.shields.io/pub/points/skio_uvc_camera)](https://pub.dev/packages/skio_uvc_camera/score)
+[![CI](https://github.com/skio-flutter/skio/actions/workflows/ci.yaml/badge.svg)](https://github.com/skio-flutter/skio/actions/workflows/ci.yaml)
+[![License: BSD-3-Clause](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/skio-flutter/skio/blob/main/LICENSE)
+
 Use **USB cameras** in a Flutter app: endoscopes, microscopes, inspection
 cameras, document cameras and ordinary USB webcams. These all follow the
 **USB Video Class (UVC)** standard. The package shows a **live preview**,
@@ -32,6 +37,8 @@ hardware plugins.
 - [Limitations](#limitations)
 - [Example app](#example-app)
 - [Testing your app without a camera](#testing-your-app-without-a-camera)
+- [FAQ](#faq)
+- [Compared with other packages](#compared-with-other-packages)
 
 ## Platforms
 
@@ -397,6 +404,57 @@ import 'package:skio_uvc_camera/platform_interface.dart';
 
 setUp(() => UvcCameraPlatform.instance = MyFakeCameraPlatform());
 ```
+
+## FAQ
+
+**How do I show a USB endoscope, microscope or webcam in a Flutter app?**
+Plug the camera into the phone with a USB OTG cable, then call
+`UvcCamera.devices()`, `requestAccess()` and `open()`, and put
+`UvcPreview(camera: camera)` in your widget tree. See the
+[quick start](#quick-start).
+
+**How do I choose the camera resolution (width and height)?**
+Pass the sizes you want in order of preference:
+`UvcCamera.open(device, preferred: [UvcSize(1920, 1080), UvcSize(1280, 720)])`.
+The first one the camera supports is used; `camera.supportedSizes` lists them
+all. See [Choose the resolution](#choose-the-resolution).
+
+**Can I use the button on the camera to take a photo?**
+Yes, on Android: `camera.buttonPresses.listen((_) => camera.capture())`.
+Each press arrives once.
+
+**Where are photos saved?**
+On Android, as JPEG files in the app's cache folder (`photo.path`). On the
+web, in memory (`photo.readAsBytes()`).
+
+**Does it work on iPhone or iPad?**
+Not yet. iPads (iPadOS 17 and later) support USB cameras, and iPad support is
+planned. iPhones don't give apps access to USB cameras.
+
+**Does it work on Windows, macOS or Linux?**
+Not yet; desktop support is planned.
+
+**Which Android permissions does it add?**
+Only `CAMERA`. It removes the microphone, storage and foreground-service
+permissions the underlying library would otherwise add.
+
+**Does it collect data or use the network?**
+No. The package has no network access and no telemetry.
+
+## Compared with other packages
+
+A fair summary to help you choose (versions as of September 2026):
+
+| Package | Android | Web | Snapshot button | Latest release |
+| --- | --- | --- | --- | --- |
+| **skio_uvc_camera** | Yes | Yes | Yes (Android) | 0.1.0, 2026 |
+| [uvccamera](https://pub.dev/packages/uvccamera) | Yes | No | See its docs | 0.0.13, March 2025 |
+| [flutter_uvc_camera](https://pub.dev/packages/flutter_uvc_camera) | Yes | No | See its docs | 1.0.0, May 2025 |
+
+Choose **skio_uvc_camera** for Android and the web with one API, a
+resolution chooser, typed errors and a minimal permission set. To change
+settings of a webcam on macOS or Windows, see
+[`uvc`](https://pub.dev/packages/uvc).
 
 ## How it works (Android)
 
