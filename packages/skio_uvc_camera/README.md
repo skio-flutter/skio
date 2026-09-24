@@ -9,8 +9,6 @@ button**.
 Part of the [skio](https://github.com/skio-flutter/skio) family of Flutter
 hardware plugins.
 
-> **Status: beta.** Tested on a real phone and camera (see
-> [Tested hardware](#tested-hardware)). The API may still change before 0.1.0.
 
 ## Contents
 
