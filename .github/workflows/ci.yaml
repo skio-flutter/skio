@@ -58,6 +58,10 @@ jobs:
         working-directory: packages/skio_usb_serial/example
         run: flutter build apk --release
 
+      - name: Build camera example (web)
+        working-directory: packages/uvc_camera/example
+        run: flutter build web --release
+
       - name: Build camera example (Android release)
         working-directory: packages/uvc_camera/example
         run: flutter build apk --release

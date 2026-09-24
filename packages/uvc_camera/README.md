@@ -5,8 +5,8 @@ inspection cameras and USB webcams. Live preview, JPEG capture and the
 camera's own hardware button, on **Android** (USB OTG) and the **web**.
 Part of the [skio](https://github.com/skio-flutter/skio) family.
 
-> Status: in development. The Dart API and the Android backend are in place;
-> the web backend is being added.
+> Status: in development. Android and web backends are in place; they have
+> not yet been tested with a real UVC camera.
 
 ```dart
 import 'package:uvc_camera/uvc_camera.dart';
@@ -56,6 +56,18 @@ await cam.close();
 - Captured JPEGs go to the app's cache directory; move or delete them.
 - Cheap cameras often report only 1280x720 and 640x480 (MJPEG) plus YUYV
   sizes; use `supportedSizes` rather than assuming 1080p.
+
+## Web
+
+- A UVC camera is an ordinary webcam in the browser, so this uses
+  `getUserMedia`. Call `requestAccess()` from a user gesture; labels and
+  ids stay hidden until the page has camera permission.
+- Vendor and product IDs are read from Chrome's camera labels
+  (`Name (0c45:6366)`), so `DeviceFilter` works there too.
+- `supportedSizes` lists common sizes up to what the camera's track allows.
+- Capture encodes the current video frame as JPEG and returns an in-memory
+  `XFile`.
+- The camera's hardware button is not available to web pages.
 
 ## Testing your app without hardware
 

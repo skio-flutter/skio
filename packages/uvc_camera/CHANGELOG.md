@@ -10,4 +10,7 @@
   Flutter texture that follows the surface lifecycle, CAMERA + USB
   permission in one call, JPEG capture encoded in Java, hardware button,
   unplug detection. Declares only the CAMERA permission.
+- Web backend: `getUserMedia` preview in an `HtmlElementView`, vendor and
+  product IDs from Chrome labels, attach/detach via `devicechange`, JPEG
+  capture from the video frame.
 - Example app: USB camera viewer.
