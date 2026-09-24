@@ -1,4 +1,11 @@
-## 0.1.1
+## 0.1.2
+
+- Tested hardware in the README now lists the boards (ESP32, STM32) and
+  phones (vivo, OPPO, Samsung, POCO) the package has been used with.
+- Includes the 0.1.1 documentation changes below (0.1.1 was not published
+  separately).
+
+## 0.1.1 (not published separately)
 
 - README rewritten: every feature explained with an example (finding and
   picking ports, permission, settings, receiving, line reading, sending,

@@ -471,10 +471,10 @@
   <div class="ticker" aria-label="Supported hardware">
     <div class="ticker-track">
       <ul>
-        <li>CP210x</li><li>CH340</li><li>CH9102</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>ESP32 native USB</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li><li>macOS · Windows · Linux · iPad (coming soon)</li>
+        <li>ESP32</li><li>STM32</li><li>Arduino</li><li>CP210x</li><li>CH340</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li><li>macOS · Windows · Linux · iPad (coming soon)</li>
       </ul>
       <ul aria-hidden="true">
-        <li>CP210x</li><li>CH340</li><li>CH9102</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>ESP32 native USB</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li><li>macOS · Windows · Linux · iPad (coming soon)</li>
+        <li>ESP32</li><li>STM32</li><li>Arduino</li><li>CP210x</li><li>CH340</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li><li>macOS · Windows · Linux · iPad (coming soon)</li>
       </ul>
     </div>
   </div>
@@ -489,7 +489,7 @@
           <div class="card-top"><div class="status"><span class="led live"></span>Stable · v0.1</div><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v14M8 7l4-4 4 4M7 11v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/><circle cx="12" cy="19.5" r="1.5"/></svg></div></div>
           <h3>skio_usb_serial</h3>
           <p>Send and receive data with USB serial devices: Arduino and ESP32 boards, USB-to-serial adapters, instruments. Android over USB OTG, and Chrome or Edge with Web Serial.</p>
-          <ul class="chips"><li>CP210x</li><li>CH340</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li></ul>
+          <ul class="chips"><li>ESP32</li><li>STM32</li><li>Arduino</li><li>CP210x</li><li>CH340</li><li>FTDI</li></ul>
           <div class="card-links"><a href="https://pub.dev/packages/skio_usb_serial">pub.dev →</a><a href="https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial">Docs →</a></div>
         </article>
         <article class="card reveal">
@@ -612,13 +612,13 @@ cam.buttonPresses.<span class="f">listen</span>((_) =&gt; cam.<span class="f">ca
               <td data-label="Package">skio_usb_serial</td>
               <td data-label="Android"><span class="pill">stable</span><small>USB OTG, Android 7.0+</small></td>
               <td data-label="Web"><span class="pill">stable</span><small>Web Serial, Chrome and Edge</small></td>
-              <td data-label="Notes">Tested with a CH340 adapter on Android 16 and in Chrome on macOS.</td>
+              <td data-label="Notes">Tested with ESP32 and STM32 boards on vivo, OPPO, Samsung and POCO phones, and in Chrome on macOS.</td>
             </tr>
             <tr>
               <td data-label="Package">skio_uvc_camera</td>
               <td data-label="Android"><span class="pill">stable</span><small>USB OTG, Android 7.0+</small></td>
               <td data-label="Web"><span class="pill">stable</span><small>getUserMedia; no snapshot button</small></td>
-              <td data-label="Notes">Preview, JPEG photos, snapshot button and resolution choice. Tested with a Sonix UVC camera on Android 16.</td>
+              <td data-label="Notes">Preview, JPEG photos, snapshot button and resolution choice. Tested with a USB camera on a POCO phone (Android 16).</td>
             </tr>
             <tr>
               <td data-label="Package">skio_core</td>
@@ -639,8 +639,12 @@ cam.buttonPresses.<span class="f">listen</span>((_) =&gt; cam.<span class="f">ca
         </div>
       </div>
       <div class="chip-row reveal">
-        <span>USB serial chips:</span>
-        <ul class="chips"><li>CP210x</li><li>CH340 / CH9102</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>ESP32 native USB</li></ul>
+        <span>Tested on phones:</span>
+        <ul class="chips"><li>vivo</li><li>OPPO</li><li>Samsung</li><li>POCO</li></ul>
+      </div>
+      <div class="chip-row reveal">
+        <span>USB serial boards and chips:</span>
+        <ul class="chips"><li>ESP32</li><li>STM32</li><li>CP210x</li><li>CH340 / CH9102</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li></ul>
       </div>
     </section>
 

@@ -351,10 +351,22 @@ the package.
 
 ## Tested hardware
 
-| Adapter | Platform | Result |
+**Boards**
+
+| Board | Connection | Result |
 | --- | --- | --- |
-| CH340 (1a86:7523) | Android 16, POCO M7 5G, USB OTG | Listing, permission, open, receive and send work |
-| CH340 (1a86:7523) | Chrome on macOS, Web Serial | Choose port, open, receive and send work |
+| ESP32 | Through its CH340 USB-serial chip (1a86:7523) | Listing, permission, open, receive and send work |
+| STM32 microcontroller boards | USB serial | Open, receive and send work |
+
+**Phones and browsers**
+
+| Device | Platform | Result |
+| --- | --- | --- |
+| vivo | Android, USB OTG | Works |
+| OPPO | Android, USB OTG | Works |
+| Samsung | Android, USB OTG | Works |
+| POCO M7 5G | Android 16, USB OTG | Works |
+| Chrome on macOS | Web Serial | Works |
 
 Tried another adapter or phone? Please
 [open an issue](https://github.com/skio-flutter/skio/issues) with the result
