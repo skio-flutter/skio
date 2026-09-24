@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- USB host is optional so apps using this plugin still install on
+         devices without USB OTG; the plugin reports no ports there. -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
+</manifest>
