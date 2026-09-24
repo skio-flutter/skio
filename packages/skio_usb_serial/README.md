@@ -357,6 +357,7 @@ the package.
 | --- | --- | --- |
 | ESP32 | Through its CH340 USB-serial chip (1a86:7523) | Listing, permission, open, receive and send work |
 | STM32 microcontroller boards | USB serial | Open, receive and send work |
+| Nordic (nRF) boards | USB serial | Open, receive and send work |
 
 **Phones and browsers**
 
