@@ -56,6 +56,7 @@ const _allow = <String, Set<String>>{
   },
   'dev.skio.uvc_camera.UvcPreviewTexture': {'<init>', 'id', 'start', 'release'},
   'dev.skio.uvc_camera.JpegCapture': {'capture'},
+  'dev.skio.uvc_camera.ButtonForwarder': {'<init>'},
 };
 
 /// Nested classes to bind in full. Other nested classes of bound classes are
@@ -66,6 +67,7 @@ const _nested = {
   r'dev.skio.uvc_camera.UvcCameraPlugin$PermissionCallback',
   r'dev.skio.uvc_camera.UvcPreviewTexture$Listener',
   r'dev.skio.uvc_camera.JpegCapture$Callback',
+  r'dev.skio.uvc_camera.ButtonForwarder$Listener',
 };
 
 final class _AllowList extends Visitor {
