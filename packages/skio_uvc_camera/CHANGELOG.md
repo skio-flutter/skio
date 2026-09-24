@@ -6,7 +6,7 @@
   it and forwards to Dart.
 - Verified on a POCO M7 5G (Android 16) with a Sonix UVC camera
   (0c45:64ab): listing, permissions, 1280x720 MJPEG preview, JPEG capture,
-  hardware button and background/resume.
+  hardware button, background/resume and unplug/replug.
 - Example: delete photos from the thumbnail strip or the full-size viewer;
   debug builds print skio logs.
 
