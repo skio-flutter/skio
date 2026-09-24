@@ -6,6 +6,11 @@ PL2303, CDC-ACM and ESP32/RP2040 native USB. Android calls the OS directly
 through JNI (jnigen), so there are no platform channels, and all queueing and
 framing logic is Dart you can unit-test.
 
+> **Beta.** The API may still change before 0.1.0. The Android backend has not
+> been tested on real USB hardware yet. If you try it, please
+> [open an issue](https://github.com/skio-flutter/skio/issues) with your
+> adapter, phone model and `SkioLog` output (see Debug logging).
+
 ```dart
 import 'dart:convert';
 

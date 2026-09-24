@@ -7,6 +7,8 @@ UVC cameras. No Flutter dependency and no platform code.
 You normally don't depend on this package directly. Each skio plugin
 re-exports it.
 
+> **Beta.** The API may still change before 0.1.0.
+
 ```dart
 import 'package:skio_core/skio_core.dart';
 
