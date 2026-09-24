@@ -2,14 +2,69 @@
 //
 // Works with any USB serial adapter or board (CP210x, CH340, FTDI, CDC-ACM,
 // Arduino, ESP32, ...) on Android over USB OTG and in desktop Chrome/Edge.
+// The Logs page shows skio's own log, so problems can be diagnosed on the
+// device without a debugger.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:skio_usb_serial/skio_usb_serial.dart';
 
-void main() => runApp(const TerminalApp());
+/// In-memory log shared by the terminal and the Logs page.
+final logBook = LogBook();
+
+void main() {
+  logBook.start(kDebugMode ? LogLevel.debug : LogLevel.info);
+  runApp(const TerminalApp());
+}
+
+/// Keeps the most recent skio log records for the Logs page.
+class LogBook extends ChangeNotifier {
+  static const _max = 2000;
+  final records = <LogRecord>[];
+  StreamSubscription<LogRecord>? _sub;
+
+  LogLevel get level => SkioLog.level;
+
+  void start(LogLevel level) {
+    SkioLog.level = level;
+    _sub ??= SkioLog.records.listen((r) {
+      if (kDebugMode) debugPrint('$r');
+      records.add(r);
+      if (records.length > _max) records.removeRange(0, records.length - _max);
+      notifyListeners();
+    });
+  }
+
+  void setLevel(LogLevel level) {
+    SkioLog.level = level;
+    notifyListeners();
+  }
+
+  /// Adds a line from the app itself (not from skio).
+  void note(String message, {LogLevel level = LogLevel.info, Object? error}) {
+    records.add(
+      LogRecord(
+        time: DateTime.now(),
+        level: level,
+        source: 'app',
+        message: message,
+        error: error,
+      ),
+    );
+    notifyListeners();
+  }
+
+  void clear() {
+    records.clear();
+    notifyListeners();
+  }
+
+  String asText() => records.map((r) => '$r').join('\n');
+}
 
 class TerminalApp extends StatelessWidget {
   const TerminalApp({super.key});
@@ -17,6 +72,7 @@ class TerminalApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'skio serial terminal',
+    debugShowCheckedModeBanner: false,
     theme: ThemeData(colorSchemeSeed: Colors.teal, useMaterial3: true),
     darkTheme: ThemeData(
       colorSchemeSeed: Colors.teal,
@@ -37,6 +93,13 @@ enum LineEnding {
   final String value;
 }
 
+/// A problem shown inline above the terminal, with what to do about it.
+class Problem {
+  const Problem(this.title, [this.hint]);
+  final String title;
+  final String? hint;
+}
+
 class TerminalPage extends StatefulWidget {
   const TerminalPage({super.key});
 
@@ -50,6 +113,7 @@ class _TerminalPageState extends State<TerminalPage> {
     19200,
     38400,
     57600,
+    74880,
     115200,
     230400,
     460800,
@@ -62,8 +126,13 @@ class _TerminalPageState extends State<TerminalPage> {
   UsbSerialPort? _port;
   bool _dtr = false;
   bool _rts = false;
+  bool _connecting = false;
+  bool _supported = true;
+  Problem? _problem;
 
   final _received = BytesBuilder();
+  int _rxBytes = 0;
+  int _txBytes = 0;
   bool _showHex = false;
   bool _sendHex = false;
   LineEnding _ending = LineEnding.lf;
@@ -72,14 +141,19 @@ class _TerminalPageState extends State<TerminalPage> {
   final _scroll = ScrollController();
   StreamSubscription<DeviceEvent>? _events;
 
+  bool get _chooser => UsbSerialPort.requiresUserSelection;
+
   @override
   void initState() {
     super.initState();
+    unawaited(_checkSupport());
     _events = UsbSerialPort.events.listen((event) {
-      _toast(switch (event) {
+      final text = switch (event) {
         DeviceAttached() => 'Attached: ${_label(event.device)}',
         DeviceDetached() => 'Detached: ${_label(event.device)}',
-      });
+      };
+      logBook.note(text);
+      _toast(text);
       unawaited(_refresh());
     });
     unawaited(_refresh());
@@ -94,6 +168,22 @@ class _TerminalPageState extends State<TerminalPage> {
     super.dispose();
   }
 
+  Future<void> _checkSupport() async {
+    final access = await UsbSerialPort.access.checkAccess();
+    if (!mounted || access.status != AccessStatus.unsupported) return;
+    setState(() {
+      _supported = false;
+      _problem = Problem(
+        'USB serial is not available here',
+        kIsWeb
+            ? 'Use Chrome or Edge on a computer, and open the page over '
+                  'https or http://localhost. Safari and Firefox do not '
+                  'support Web Serial.'
+            : access.hint,
+      );
+    });
+  }
+
   Future<void> _refresh() async {
     final devices = await UsbSerialPort.list();
     if (!mounted) return;
@@ -106,25 +196,43 @@ class _TerminalPageState extends State<TerminalPage> {
   }
 
   Future<void> _pickPort() async {
+    setState(() => _problem = null);
     try {
       final device = await UsbSerialPort.request();
       await _refresh();
-      if (device != null) setState(() => _selected = device);
+      if (device == null) {
+        logBook.note('Port chooser closed without a choice');
+        return;
+      }
+      logBook.note('Chose ${_label(device)}');
+      setState(() => _selected = device);
     } on HardwareException catch (e) {
-      _toast(e.message);
+      _report(e);
     }
   }
 
   Future<void> _connect() async {
     final device = _selected;
     if (device == null) return;
+    setState(() {
+      _connecting = true;
+      _problem = null;
+    });
     try {
       var access = await UsbSerialPort.access.checkAccess(device);
       if (!access.isUsable) {
         access = await UsbSerialPort.access.requestAccess(device);
       }
       if (!access.isUsable) {
-        _toast('Permission ${access.status.name}. ${access.hint ?? ''}');
+        setState(
+          () => _problem = Problem(
+            'Permission ${access.status.name}',
+            access.hint ??
+                (kIsWeb
+                    ? 'Choose the port again with "Choose port".'
+                    : 'Tap Connect and allow the USB dialog.'),
+          ),
+        );
         return;
       }
       final port = await UsbSerialPort.open(
@@ -133,15 +241,18 @@ class _TerminalPageState extends State<TerminalPage> {
       );
       port.input.listen(
         _onData,
-        onError: (Object e) =>
-            _toast(e is HardwareException ? e.message : '$e'),
+        onError: (Object e) {
+          if (e is HardwareException) _report(e);
+        },
         onDone: () {
           if (mounted) setState(() => _port = null);
         },
       );
       setState(() => _port = port);
     } on HardwareException catch (e) {
-      _toast(e.message);
+      _report(e);
+    } finally {
+      if (mounted) setState(() => _connecting = false);
     }
   }
 
@@ -151,7 +262,10 @@ class _TerminalPageState extends State<TerminalPage> {
   }
 
   void _onData(Uint8List bytes) {
-    setState(() => _received.add(bytes));
+    setState(() {
+      _received.add(bytes);
+      _rxBytes += bytes.length;
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
         _scroll.jumpTo(_scroll.position.maxScrollExtent);
@@ -176,9 +290,10 @@ class _TerminalPageState extends State<TerminalPage> {
     }
     try {
       await port.write(bytes);
+      setState(() => _txBytes += bytes.length);
       _sendController.clear();
     } on HardwareException catch (e) {
-      _toast(e.message);
+      _report(e);
     }
   }
 
@@ -190,8 +305,35 @@ class _TerminalPageState extends State<TerminalPage> {
     try {
       await _port?.setSignals(dtr: dtr, rts: rts);
     } on HardwareException catch (e) {
-      _toast(e.message);
+      _report(e);
     }
+  }
+
+  /// Shows [e] inline with a hint on what to do, and logs it.
+  void _report(HardwareException e) {
+    logBook.note(e.message, level: LogLevel.warning, error: e.cause);
+    final hint = switch (e) {
+      DeviceBusy() =>
+        kIsWeb
+            ? 'Close other tabs or programs using the port (serial '
+                  'monitors, Arduino IDE), then connect again.'
+            : 'Another app is using the device. Unplug and replug it.',
+      AccessDenied() =>
+        kIsWeb
+            ? 'Click "Choose port" and pick the adapter in the popup.'
+            : 'Tap Connect again and allow the USB dialog.',
+      DeviceNotFound() =>
+        kIsWeb
+            ? 'Plug the adapter back in and choose the port again.'
+            : 'Plug the adapter back in, then tap Refresh.',
+      Disconnected() => 'Check the cable, then connect again.',
+      OperationTimeout() =>
+        'The device did not accept data. Check the baud rate and flow '
+            'control.',
+      Unsupported() => 'Try other settings (8N1 works with every adapter).',
+      ProtocolError() => 'See Logs for details.',
+    };
+    if (mounted) setState(() => _problem = Problem(e.message, hint));
   }
 
   static Uint8List? _parseHex(String text) {
@@ -246,7 +388,18 @@ class _TerminalPageState extends State<TerminalPage> {
           IconButton(
             tooltip: 'Clear',
             icon: const Icon(Icons.delete_sweep_outlined),
-            onPressed: () => setState(_received.clear),
+            onPressed: () => setState(() {
+              _received.clear();
+              _rxBytes = 0;
+              _txBytes = 0;
+            }),
+          ),
+          IconButton(
+            tooltip: 'Logs',
+            icon: const Icon(Icons.bug_report_outlined),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute<void>(builder: (_) => const LogsPage())),
           ),
         ],
       ),
@@ -254,22 +407,11 @@ class _TerminalPageState extends State<TerminalPage> {
         child: Column(
           children: [
             _connectionBar(connected),
-            if (!connected) _settings(),
+            if (_problem != null) _problemBanner(_problem!),
+            if (!connected && _supported) _settings(),
             if (connected) _signals(),
             const Divider(height: 1),
-            Expanded(
-              child: SingleChildScrollView(
-                controller: _scroll,
-                padding: const EdgeInsets.all(12),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: SelectableText(
-                    _output(),
-                    style: const TextStyle(fontFamily: 'monospace'),
-                  ),
-                ),
-              ),
-            ),
+            Expanded(child: _terminalOrHelp(connected)),
             const Divider(height: 1),
             _sendBar(connected),
           ],
@@ -286,25 +428,29 @@ class _TerminalPageState extends State<TerminalPage> {
           child: DropdownButtonFormField<DeviceHandle>(
             initialValue: _selected,
             isExpanded: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Port',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               isDense: true,
+              helperText: _chooser ? 'Ports this site may use' : null,
             ),
-            hint: const Text('No ports found'),
+            hint: Text(_chooser ? 'No port chosen yet' : 'No ports found'),
             items: [
               for (final d in _devices)
-                DropdownMenuItem(value: d, child: Text(_label(d))),
+                DropdownMenuItem(
+                  value: d,
+                  child: Text(_label(d), overflow: TextOverflow.ellipsis),
+                ),
             ],
             onChanged: connected ? null : (d) => setState(() => _selected = d),
           ),
         ),
         const SizedBox(width: 8),
-        if (UsbSerialPort.requiresUserSelection)
-          IconButton.outlined(
-            tooltip: 'Pick a port',
-            onPressed: connected ? null : _pickPort,
-            icon: const Icon(Icons.add_link),
+        if (_chooser)
+          OutlinedButton.icon(
+            onPressed: connected || !_supported ? null : _pickPort,
+            icon: const Icon(Icons.usb),
+            label: const Text('Choose port'),
           )
         else
           IconButton.outlined(
@@ -319,12 +465,74 @@ class _TerminalPageState extends State<TerminalPage> {
                 child: const Text('Disconnect'),
               )
             : FilledButton(
-                onPressed: _selected == null ? null : _connect,
-                child: const Text('Connect'),
+                onPressed: _selected == null || _connecting ? null : _connect,
+                child: Text(_connecting ? 'Connecting…' : 'Connect'),
               ),
       ],
     ),
   );
+
+  Widget _problemBanner(Problem problem) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+      child: Material(
+        color: scheme.errorContainer,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.error_outline, color: scheme.onErrorContainer),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      problem.title,
+                      style: TextStyle(
+                        color: scheme.onErrorContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (problem.hint != null)
+                      Text(
+                        problem.hint!,
+                        style: TextStyle(color: scheme.onErrorContainer),
+                      ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: 'Dismiss',
+                icon: Icon(Icons.close, color: scheme.onErrorContainer),
+                onPressed: () => setState(() => _problem = null),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _terminalOrHelp(bool connected) {
+    if (!connected && _received.isEmpty && _supported) {
+      return _Help(chooser: _chooser, hasPorts: _devices.isNotEmpty);
+    }
+    return SingleChildScrollView(
+      controller: _scroll,
+      padding: const EdgeInsets.all(12),
+      child: SizedBox(
+        width: double.infinity,
+        child: SelectableText(
+          _output(),
+          style: const TextStyle(fontFamily: 'monospace'),
+        ),
+      ),
+    );
+  }
 
   Widget _settings() => Padding(
     padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
@@ -395,8 +603,12 @@ class _TerminalPageState extends State<TerminalPage> {
     padding: const EdgeInsets.symmetric(horizontal: 12),
     child: Row(
       children: [
-        Text('${_config.baudRate} baud'),
-        const Spacer(),
+        Expanded(
+          child: Text(
+            '${_config.baudRate} baud · RX $_rxBytes · TX $_txBytes',
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         const Text('DTR'),
         Switch(
           value: _dtr,
@@ -453,4 +665,161 @@ class _TerminalPageState extends State<TerminalPage> {
       ],
     ),
   );
+}
+
+/// Step-by-step help shown before the first connection.
+class _Help extends StatelessWidget {
+  const _Help({required this.chooser, required this.hasPorts});
+
+  final bool chooser;
+  final bool hasPorts;
+
+  @override
+  Widget build(BuildContext context) {
+    final steps = chooser
+        ? [
+            'Plug in your USB serial adapter or board.',
+            'Click "Choose port" and pick it in the browser popup '
+                '(for example "USB Serial" or "cu.usbserial…").',
+            'Set the baud rate your device uses, then click Connect.',
+            'Chosen ports are remembered for this site next time.',
+          ]
+        : [
+            'Plug in the adapter with a USB OTG cable or adapter.',
+            hasPorts
+                ? 'Pick it under Port and tap Connect.'
+                : 'Tap Refresh if it does not appear under Port.',
+            'Allow the USB permission dialog.',
+            'Set the baud rate your device uses.',
+          ];
+    final theme = Theme.of(context);
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        Text('Getting started', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 12),
+        for (final (i, step) in steps.indexed)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(radius: 12, child: Text('${i + 1}')),
+                const SizedBox(width: 12),
+                Expanded(child: Text(step)),
+              ],
+            ),
+          ),
+        const SizedBox(height: 8),
+        Text(
+          'Something not working? Open Logs (bug icon) and copy the log '
+          'into your bug report.',
+          style: theme.textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+}
+
+/// Shows skio's log with a level selector, copy and clear.
+class LogsPage extends StatelessWidget {
+  const LogsPage({super.key});
+
+  static const _levels = [
+    LogLevel.info,
+    LogLevel.debug,
+    LogLevel.trace,
+    LogLevel.off,
+  ];
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: logBook,
+    builder: (context, _) {
+      final records = logBook.records;
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Logs'),
+          actions: [
+            DropdownButton<LogLevel>(
+              value: logBook.level,
+              underline: const SizedBox.shrink(),
+              items: [
+                for (final l in _levels)
+                  DropdownMenuItem(
+                    value: l,
+                    child: Text(switch (l) {
+                      LogLevel.trace => 'Trace (all bytes)',
+                      LogLevel.off => 'Off',
+                      _ => l.name[0].toUpperCase() + l.name.substring(1),
+                    }),
+                  ),
+              ],
+              onChanged: (l) {
+                if (l != null) logBook.setLevel(l);
+              },
+            ),
+            IconButton(
+              tooltip: 'Copy all',
+              icon: const Icon(Icons.copy_all_outlined),
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: logBook.asText()));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Copied ${records.length} lines')),
+                  );
+                }
+              },
+            ),
+            IconButton(
+              tooltip: 'Clear',
+              icon: const Icon(Icons.delete_sweep_outlined),
+              onPressed: logBook.clear,
+            ),
+          ],
+        ),
+        body: records.isEmpty
+            ? const Center(child: Text('Nothing logged yet'))
+            : ListView.builder(
+                reverse: true,
+                padding: const EdgeInsets.all(8),
+                itemCount: records.length,
+                itemBuilder: (context, i) {
+                  final r = records[records.length - 1 - i];
+                  return _LogLine(record: r);
+                },
+              ),
+      );
+    },
+  );
+}
+
+class _LogLine extends StatelessWidget {
+  const _LogLine({required this.record});
+
+  final LogRecord record;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final color = switch (record.level) {
+      LogLevel.error || LogLevel.warning => scheme.error,
+      LogLevel.trace => scheme.outline,
+      _ => scheme.onSurface,
+    };
+    final t = record.time;
+    String two(int v) => v.toString().padLeft(2, '0');
+    final time =
+        '${two(t.hour)}:${two(t.minute)}:${two(t.second)}.'
+        '${t.millisecond.toString().padLeft(3, '0')}';
+    final error = record.error == null ? '' : '  (${record.error})';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: SelectableText(
+        '$time ${record.level.name.toUpperCase().padRight(7)} '
+        '${record.message}$error',
+        style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: color),
+      ),
+    );
+  }
 }
