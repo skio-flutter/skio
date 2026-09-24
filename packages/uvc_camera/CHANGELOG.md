@@ -6,3 +6,8 @@
 - `UvcSize`, `UvcFrameFormat` and `selectPreviewSize` for choosing from the
   sizes a camera reports.
 - Platform interface with `UvcCameraPlatform` for fakes in tests.
+- Android backend: UVCAndroid 1.0.13 through JNI (jnigen), preview into a
+  Flutter texture that follows the surface lifecycle, CAMERA + USB
+  permission in one call, JPEG capture encoded in Java, hardware button,
+  unplug detection. Declares only the CAMERA permission.
+- Example app: USB camera viewer.
