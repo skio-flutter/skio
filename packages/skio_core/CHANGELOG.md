@@ -1,3 +1,7 @@
+## 0.1.0
+
+First stable release. No API changes since 0.1.0-beta.1.
+
 ## 0.1.0-beta.1
 
 First beta. The API may still change before 0.1.0.

@@ -1,3 +1,13 @@
+## 0.1.0
+
+First stable release. No API changes since 0.1.0-beta.1.
+
+- Verified on real hardware with a CH340 adapter: Android 16 (POCO M7 5G)
+  over USB OTG, and Chrome on macOS through Web Serial. Listing, USB
+  permission, open, receive, send and DTR/RTS work.
+- Example: a labelled "Choose port" button on the web, step-by-step help,
+  inline error hints and a Logs page with copy for bug reports.
+
 ## 0.1.0-beta.1
 
 First beta. Web Serial has been checked in Chromium. The Android backend is

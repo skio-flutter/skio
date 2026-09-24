@@ -5,8 +5,8 @@ Flutter hardware plugins that call native APIs directly (jnigen, ffigen,
 
 | Package | What it does | Status |
 | --- | --- | --- |
-| [`skio_core`](packages/skio_core) | Shared types: access/permission status, errors, device filters, logging | Beta |
-| [`skio_usb_serial`](packages/skio_usb_serial) | USB serial port (Android USB OTG, Web Serial) | Beta |
+| [`skio_core`](packages/skio_core) | Shared types: access/permission status, errors, device filters, logging | Stable |
+| [`skio_usb_serial`](packages/skio_usb_serial) | USB serial port (Android USB OTG, Web Serial) | Stable |
 | [`skio_uvc_camera`](packages/skio_uvc_camera) | USB Video Class camera (Android, web) | Beta |
 
 Design notes are kept privately for now.

@@ -6,10 +6,6 @@ PL2303, CDC-ACM and ESP32/RP2040 native USB. Android calls the OS directly
 through JNI (jnigen), so there are no platform channels, and all queueing and
 framing logic is Dart you can unit-test.
 
-> **Beta.** The API may still change before 0.1.0. The Android backend has not
-> been tested on real USB hardware yet. If you try it, please
-> [open an issue](https://github.com/skio-flutter/skio/issues) with your
-> adapter, phone model and `SkioLog` output (see Debug logging).
 
 ```dart
 import 'dart:convert';
@@ -42,6 +38,17 @@ await port.close();
 | Permission | USB dialog per device: `access.requestAccess(device)` | Picking the port in the chooser is the permission |
 | Attach/detach events | Yes (polled every second while listened) | Yes |
 | Parity mark/space, 1.5 stop bits, DTR/DSR and XON/XOFF flow control | Depends on the chip | Not supported (`Unsupported`) |
+
+## Tested hardware
+
+| Adapter | Platform | Result |
+| --- | --- | --- |
+| CH340 (1a86:7523) | Android 16, POCO M7 5G, USB OTG | ✅ list, permission, open, receive, send |
+| CH340 (1a86:7523) | Chrome on macOS, Web Serial | ✅ choose port, open, receive, send |
+
+Tried another adapter or phone? Please
+[open an issue](https://github.com/skio-flutter/skio/issues) with the result
+and your `SkioLog` output.
 
 ## Setup
 
