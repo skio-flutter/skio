@@ -1,4 +1,9 @@
-## 0.1.0-dev
+## 0.1.0-beta.1
+
+First beta. Web Serial has been checked in Chromium. The Android backend is
+verified on an emulator and against the usb-serial-for-android source, but
+not yet on real USB hardware; please report results with `SkioLog` output.
+
 
 - `UsbSerialPort`: list, open, buffered byte input, ordered writes with
   timeouts, DTR/RTS control, clean close and disconnect handling.
