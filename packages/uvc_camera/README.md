@@ -5,8 +5,8 @@ inspection cameras and USB webcams. Live preview, JPEG capture and the
 camera's own hardware button, on **Android** (USB OTG) and the **web**.
 Part of the [skio](https://github.com/skio-flutter/skio) family.
 
-> Status: in development. The Dart API and tests are in place; the Android
-> and web backends are being added.
+> Status: in development. The Dart API and the Android backend are in place;
+> the web backend is being added.
 
 ```dart
 import 'package:uvc_camera/uvc_camera.dart';
@@ -40,6 +40,22 @@ await cam.close();
 - `status` stream: previewing, paused, disconnected, closed
 - Errors are `HardwareException`s from `skio_core`; opt-in logging via
   `SkioLog`
+
+## Android
+
+- USB host (OTG) through [UVCAndroid](https://github.com/shiyinghan/UVCAndroid)
+  1.0.13 (Apache-2.0) from Maven Central, called from Dart through JNI. Only
+  three small Java classes exist: the texture/permission bridge, the preview
+  texture's surface lifecycle, and JPEG encoding of a captured frame.
+- Permissions: `requestAccess(device)` asks for `CAMERA` (required from
+  Android 9 for USB video devices), then the USB grant for the device.
+- The plugin declares only `android.permission.CAMERA`. It removes the extra
+  permissions the UVC library declares (`RECORD_AUDIO`, storage,
+  `MANAGE_EXTERNAL_STORAGE`, `FOREGROUND_SERVICE`) and marks USB host and
+  camera hardware as optional, so Play Store reviews don't flag them.
+- Captured JPEGs go to the app's cache directory; move or delete them.
+- Cheap cameras often report only 1280x720 and 640x480 (MJPEG) plus YUYV
+  sizes; use `supportedSizes` rather than assuming 1080p.
 
 ## Testing your app without hardware
 

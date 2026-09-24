@@ -1,0 +1,48 @@
+group = "dev.skio.uvc_camera"
+version = "1.0"
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:9.1.0")
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: "com.android.library"
+
+android {
+    namespace = "dev.skio.uvc_camera"
+    compileSdk = 36
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    defaultConfig {
+        minSdk = 24
+        consumerProguardFiles("consumer-proguard-rules.pro")
+    }
+}
+
+dependencies {
+    // api (not implementation) so jnigen sees the classes on the example's
+    // compile classpath when regenerating bindings.
+    api("com.herohan:UVCAndroid:1.0.13") {
+        // The library's code only uses androidx annotations. Excluding these
+        // keeps several MB of unused code out of apps.
+        exclude group: "cn.hutool"
+        exclude group: "androidx.appcompat"
+        exclude group: "androidx.legacy"
+    }
+}
