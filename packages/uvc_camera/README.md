@@ -5,8 +5,11 @@ inspection cameras and USB webcams. Live preview, JPEG capture and the
 camera's own hardware button, on **Android** (USB OTG) and the **web**.
 Part of the [skio](https://github.com/skio-flutter/skio) family.
 
-> Status: in development. Android and web backends are in place; they have
-> not yet been tested with a real UVC camera.
+> **Beta.** The API may still change before 0.1.0. The Android and web
+> backends have not been tested with a real UVC camera yet. If you try it,
+> please [open an issue](https://github.com/skio-flutter/skio/issues) with
+> your camera, phone or browser, and `SkioLog` output
+> (`SkioLog.level = LogLevel.debug; SkioLog.records.listen(print);`).
 
 ```dart
 import 'package:uvc_camera/uvc_camera.dart';
