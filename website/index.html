@@ -154,6 +154,9 @@
   .card .status { display: inline-flex; align-items: center; gap: 8px; font: 500 12px/1 var(--mono); color: var(--muted); margin-bottom: 18px; }
   .card h3 { font: 700 17px/1.3 var(--mono); margin: 0 0 8px; letter-spacing: -.01em; }
   .card p { margin: 0 0 16px; color: var(--muted); font-size: 14.5px; }
+  .card-links { display: flex; gap: 14px; margin-top: 18px; font: 600 13px/1 var(--mono); }
+  .card-links a { color: var(--accent); text-decoration: none; }
+  .card-links a:hover { text-decoration: underline; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
   .chips li { font: 500 11.5px/1 var(--mono); padding: 5px 8px; border-radius: 6px; background: var(--bg-2); color: var(--muted); border: 1px solid var(--border); }
 
@@ -329,13 +332,15 @@
     <section class="hero">
       <div class="hero-grid">
         <div>
-          <div class="eyebrow"><span class="led live"></span> Open source · BSD-3-Clause<span class="wide"> · in development</span></div>
+          <div class="eyebrow"><span class="led live"></span> Open source · BSD-3-Clause<span class="wide"> · v0.1 on pub.dev</span></div>
           <h1>Flutter plugins for <em>real hardware.</em></h1>
-          <p class="lead">skio connects Flutter apps to USB serial devices and USB cameras.
-            It binds native APIs directly with jnigen and <code>dart:js_interop</code>, so there are
-            no platform channels, and the logic lives in testable Dart.</p>
+          <p class="lead">skio connects Flutter apps to USB serial devices and USB cameras,
+            on Android and in the browser. It binds native APIs directly with jnigen and
+            <code>dart:js_interop</code>, so there are no platform channels, and the logic lives in
+            testable Dart.</p>
           <div class="btns">
             <a class="btn primary" href="#start">Get started</a>
+            <a class="btn" href="https://pub.dev/publishers/skio-flutter.dev/packages">On pub.dev</a>
             <a class="btn" href="https://github.com/skio-flutter/skio">View on GitHub</a>
           </div>
         </div>
@@ -357,10 +362,10 @@
   <div class="ticker" aria-label="Supported hardware">
     <div class="ticker-track">
       <ul>
-        <li>CP210x</li><li>CH340</li><li>CH9102</li><li>FTDI</li><li>CDC-ACM</li><li>ESP32 native USB</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras (planned)</li>
+        <li>CP210x</li><li>CH340</li><li>CH9102</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>ESP32 native USB</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li>
       </ul>
       <ul aria-hidden="true">
-        <li>CP210x</li><li>CH340</li><li>CH9102</li><li>FTDI</li><li>CDC-ACM</li><li>ESP32 native USB</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras (planned)</li>
+        <li>CP210x</li><li>CH340</li><li>CH9102</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>ESP32 native USB</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li>
       </ul>
     </div>
   </div>
@@ -372,22 +377,25 @@
       <p class="sub reveal">Each plugin covers one transport. They share permissions, errors and device matching through <code>skio_core</code>.</p>
       <div class="cards">
         <article class="card reveal">
-          <div class="status"><span class="led live"></span>In development</div>
+          <div class="status"><span class="led live"></span>Stable · v0.1</div>
           <h3>skio_usb_serial</h3>
-          <p>Serial ports over USB, on Android USB OTG and Web Serial.</p>
-          <ul class="chips"><li>CP210x</li><li>CH340</li><li>FTDI</li><li>CDC-ACM</li></ul>
+          <p>Send and receive data with USB serial devices: Arduino and ESP32 boards, USB-to-serial adapters, instruments. Android over USB OTG, and Chrome or Edge with Web Serial.</p>
+          <ul class="chips"><li>CP210x</li><li>CH340</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li></ul>
+          <div class="card-links"><a href="https://pub.dev/packages/skio_usb_serial">pub.dev →</a><a href="https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial">Docs →</a></div>
         </article>
         <article class="card reveal">
-          <div class="status"><span class="led off"></span>Planned</div>
+          <div class="status"><span class="led live"></span>Stable · v0.1</div>
           <h3>skio_uvc_camera</h3>
-          <p>USB Video Class cameras on Android: live preview, JPEG capture, hardware button.</p>
-          <ul class="chips"><li>Android</li><li>UVC</li></ul>
+          <p>USB cameras (endoscopes, microscopes, webcams) on Android and the web: live preview, JPEG photos, the camera's snapshot button, and your choice of resolution.</p>
+          <ul class="chips"><li>Android</li><li>Web</li><li>UVC</li><li>MJPEG</li></ul>
+          <div class="card-links"><a href="https://pub.dev/packages/skio_uvc_camera">pub.dev →</a><a href="https://github.com/skio-flutter/skio/tree/main/packages/skio_uvc_camera">Docs →</a></div>
         </article>
         <article class="card reveal">
-          <div class="status"><span class="led live"></span>In development</div>
+          <div class="status"><span class="led live"></span>Stable · v0.1</div>
           <h3>skio_core</h3>
-          <p>Shared types: one permission API, one error family and device filters for every plugin.</p>
+          <p>The shared building blocks: one permission API, one error family, device filters and opt-in logging for every skio plugin.</p>
           <ul class="chips"><li>Pure Dart</li><li>No Flutter dependency</li></ul>
+          <div class="card-links"><a href="https://pub.dev/packages/skio_core">pub.dev →</a><a href="https://github.com/skio-flutter/skio/tree/main/packages/skio_core">Docs →</a></div>
         </article>
       </div>
     </section>
@@ -395,7 +403,7 @@
     <section class="block" id="how">
       <p class="kicker reveal">How it works</p>
       <h2 class="reveal">From your widget to the wire, in Dart.</h2>
-      <p class="sub reveal">skio calls the platform USB APIs through generated bindings. Buffering, framing and timeouts run in Dart, where you can test them.</p>
+      <p class="sub reveal">skio calls the platform USB APIs through generated bindings. Buffering, framing and timeouts run in Dart, where you can test them. The diagram shows serial; <code>skio_uvc_camera</code> takes the same path to UVCAndroid on Android and <code>getUserMedia</code> in the browser.</p>
       <div class="flow reveal">
         <div class="node">
           <div class="lbl">Your app</div>
@@ -436,17 +444,20 @@
         <div>
           <p class="kicker reveal">What it looks like</p>
           <h2 class="reveal">A small API that stays out of your way.</h2>
-          <p class="sub reveal">Open a port, listen to bytes, write bytes. Errors come from one sealed type, so you can handle them with a <code>switch</code>.</p>
+          <p class="sub reveal">Open a port and exchange bytes, or open a camera and take a photo. Errors come from one sealed type, so a <code>switch</code> can handle every case.</p>
           <ul class="features reveal">
             <li><div><code>DeviceFilter</code> <span>to match ports by vendor and product ID</span></div></li>
             <li><div><code>SerialConfig</code> <span>for baud rate, data bits, parity, stop bits and flow control</span></div></li>
             <li><div><code>dtr</code> / <code>rts</code> <span>set in the config, so ESP32 and Arduino boards don't reset on open</span></div></li>
             <li><div><code>LineReader</code> <span>for lines and UTF-8 split across reads</span></div></li>
+            <li><div><code>UvcSize</code> <span>to choose the camera resolution from what it supports</span></div></li>
+            <li><div><code>SkioLog</code> <span>opt-in logs, down to every byte, for bug reports</span></div></li>
           </ul>
         </div>
         <div class="term reveal">
           <div class="tabs" role="tablist" aria-label="Code samples">
             <button role="tab" id="tab-io" aria-controls="panel-io" aria-selected="true">serial.dart</button>
+            <button role="tab" id="tab-cam" aria-controls="panel-cam" aria-selected="false" tabindex="-1">camera.dart</button>
             <button role="tab" id="tab-err" aria-controls="panel-err" aria-selected="false" tabindex="-1">errors.dart</button>
             <button class="copy" data-copy-from="active">copy</button>
           </div>
@@ -457,17 +468,24 @@
 port.input.<span class="f">listen</span>((bytes) =&gt; <span class="f">print</span>(bytes));
 <span class="k">await</span> port.<span class="f">write</span>(utf8.<span class="f">encode</span>(<span class="s">'hello\n'</span>));
 <span class="k">await</span> port.<span class="f">close</span>();</code></pre>
+<pre role="tabpanel" id="panel-cam" aria-labelledby="tab-cam" hidden><code><span class="k">final</span> cameras = <span class="k">await</span> <span class="y">UvcCamera</span>.<span class="f">devices</span>();
+<span class="k">await</span> <span class="y">UvcCamera</span>.access.<span class="f">requestAccess</span>(cameras.first);
+
+<span class="k">final</span> cam = <span class="k">await</span> <span class="y">UvcCamera</span>.<span class="f">open</span>(cameras.first,
+    preferred: <span class="k">const</span> [<span class="y">UvcSize</span>(<span class="n">1920</span>, <span class="n">1080</span>), <span class="y">UvcSize</span>(<span class="n">1280</span>, <span class="n">720</span>)]);
+
+<span class="c">// in build(): UvcPreview(camera: cam)</span>
+<span class="k">final</span> photo = <span class="k">await</span> cam.<span class="f">capture</span>(quality: <span class="n">90</span>);
+cam.buttonPresses.<span class="f">listen</span>((_) =&gt; cam.<span class="f">capture</span>());</code></pre>
 <pre role="tabpanel" id="panel-err" aria-labelledby="tab-err" hidden><code><span class="k">try</span> {
   <span class="c">// ... call any skio plugin</span>
 } <span class="k">on</span> <span class="y">HardwareException</span> <span class="k">catch</span> (e) {
-  <span class="k">switch</span> (e) {
-    <span class="k">case</span> <span class="y">AccessDenied</span>():
-      <span class="c">// ask the user again, or point them to settings</span>
-    <span class="k">case</span> <span class="y">Disconnected</span>():
-      <span class="c">// show "reconnect the device"</span>
-    <span class="k">default</span>:
-      <span class="f">print</span>(e.message);
-  }
+  <span class="k">final</span> advice = <span class="k">switch</span> (e) {
+    <span class="y">AccessDenied</span>() =&gt; <span class="s">'Please allow access.'</span>,
+    <span class="y">Disconnected</span>() || <span class="y">DeviceNotFound</span>() =&gt; <span class="s">'Reconnect the device.'</span>,
+    <span class="y">DeviceBusy</span>() =&gt; <span class="s">'Close other apps using it.'</span>,
+    _ =&gt; e.message,
+  };
 }</code></pre>
         </div>
       </div>
@@ -476,66 +494,67 @@ port.input.<span class="f">listen</span>((bytes) =&gt; <span class="f">print</sp
     <section class="block" id="support">
       <p class="kicker reveal">Platform support</p>
       <h2 class="reveal">Where each package runs.</h2>
-      <p class="sub reveal">Nothing is on pub.dev yet. This table shows the state of the source on GitHub.</p>
+      <p class="sub reveal">All three packages are on pub.dev and have been tested with real hardware.</p>
       <div class="table-wrap reveal">
         <table>
           <thead><tr><th scope="col">Package</th><th scope="col">Android</th><th scope="col">Web</th><th scope="col">Notes</th></tr></thead>
           <tbody>
             <tr>
               <td data-label="Package">skio_usb_serial</td>
-              <td data-label="Android"><span class="pill wip">in progress</span><small>USB OTG via jnigen</small></td>
-              <td data-label="Web"><span class="pill">in place</span><small>Web Serial, Chrome and Edge</small></td>
-              <td data-label="Notes">The Dart API and Web Serial backend are in place. The Android backend is being added.</td>
+              <td data-label="Android"><span class="pill">stable</span><small>USB OTG, Android 7.0+</small></td>
+              <td data-label="Web"><span class="pill">stable</span><small>Web Serial, Chrome and Edge</small></td>
+              <td data-label="Notes">Tested with a CH340 adapter on Android 16 and in Chrome on macOS.</td>
             </tr>
             <tr>
               <td data-label="Package">skio_uvc_camera</td>
-              <td data-label="Android"><span class="pill none">planned</span></td>
-              <td data-label="Web"><span class="pill none">n/a</span></td>
-              <td data-label="Notes">Preview, JPEG capture and the camera's hardware button.</td>
+              <td data-label="Android"><span class="pill">stable</span><small>USB OTG, Android 7.0+</small></td>
+              <td data-label="Web"><span class="pill">stable</span><small>getUserMedia; no snapshot button</small></td>
+              <td data-label="Notes">Preview, JPEG photos, snapshot button and resolution choice. Tested with a Sonix UVC camera on Android 16.</td>
             </tr>
             <tr>
               <td data-label="Package">skio_core</td>
               <td data-label="Android"><span class="pill">pure Dart</span></td>
               <td data-label="Web"><span class="pill">pure Dart</span></td>
-              <td data-label="Notes">No platform code. Each plugin re-exports it.</td>
+              <td data-label="Notes">No platform code. Each plugin includes it.</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="chip-row reveal">
         <span>USB serial chips:</span>
-        <ul class="chips"><li>CP210x</li><li>CH340 / CH9102</li><li>FTDI</li><li>CDC-ACM</li><li>ESP32 native USB</li></ul>
+        <ul class="chips"><li>CP210x</li><li>CH340 / CH9102</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>ESP32 native USB</li></ul>
       </div>
     </section>
 
     <section class="block" id="start">
       <p class="kicker reveal">Get started</p>
-      <h2 class="reveal">Try it today, from source.</h2>
-      <p class="sub reveal">The first pub.dev release is coming. Until then, run the example app from the repository.</p>
+      <h2 class="reveal">Add it to your app in one line.</h2>
+      <p class="sub reveal">Each package's README on pub.dev explains every feature with examples.</p>
       <ol class="steps">
         <li class="reveal">
-          <h3>Run the example</h3>
-          <p>Clone the repo and run the serial example on an Android device or in Chrome.</p>
+          <h3>Add a package</h3>
+          <p>One command each. <code>skio_core</code> comes with them.</p>
+          <div class="snip"><pre><code><span class="p">$ </span>flutter pub add skio_usb_serial
+<span class="p">$ </span>flutter pub add skio_uvc_camera</code></pre><button class="copy">copy</button></div>
+        </li>
+        <li class="reveal">
+          <h3>Try the example apps</h3>
+          <p>A serial terminal and a USB camera viewer, for an Android phone or Chrome.</p>
           <div class="snip"><pre><code><span class="p">$ </span>git clone https://github.com/skio-flutter/skio
 <span class="p">$ </span>cd skio/packages/skio_usb_serial/example
 <span class="p">$ </span>flutter run</code></pre><button class="copy">copy</button></div>
         </li>
         <li class="reveal">
-          <h3>Add it to your app</h3>
-          <p>Once it is published, one command adds it. <code>skio_core</code> comes with it.</p>
-          <div class="snip"><pre><code><span class="p">$ </span>flutter pub add skio_usb_serial</code></pre><button class="copy">copy</button></div>
-        </li>
-        <li class="reveal">
           <h3>On the web, ask from a tap</h3>
-          <p>Browsers only list ports the user has picked. Call <code>request()</code> from a button tap before <code>list()</code>.</p>
+          <p>Browsers only list serial ports the user has picked. Call <code>request()</code> from a button tap.</p>
           <div class="snip"><pre><code><span class="y">FilledButton</span>(
   onPressed: () =&gt; <span class="y">UsbSerialPort</span>.<span class="f">request</span>(),
-  child: <span class="k">const</span> <span class="y">Text</span>(<span class="s">'Connect'</span>),
+  child: <span class="k">const</span> <span class="y">Text</span>(<span class="s">'Choose port'</span>),
 )</code></pre><button class="copy">copy</button></div>
         </li>
         <li class="reveal">
           <h3>Test without hardware</h3>
-          <p>Swap the platform for a fake in your tests. Your framing and retry logic runs as plain Dart.</p>
+          <p>Swap the platform for a fake in your tests. Your own logic runs as plain Dart.</p>
           <div class="snip"><pre><code><span class="k">import</span> <span class="s">'package:skio_usb_serial/platform_interface.dart'</span>;
 
 <span class="y">UsbSerialPlatform</span>.instance = <span class="y">MyFakePlatform</span>();</code></pre><button class="copy">copy</button></div>
@@ -559,7 +578,7 @@ port.input.<span class="f">listen</span>((bytes) =&gt; <span class="f">print</sp
 
     <section class="cta reveal">
       <h2>Build something that plugs in.</h2>
-      <p>skio is early and open. Stars, issues and pull requests all help shape the first release.</p>
+      <p>skio is open source and free to use. Stars, bug reports and pull requests all help it grow.</p>
       <div class="btns">
         <a class="btn primary" href="https://github.com/skio-flutter/skio">Star on GitHub</a>
         <a class="btn" href="https://github.com/skio-flutter/skio/issues">Open an issue</a>
