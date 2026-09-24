@@ -9,3 +9,4 @@ workspace:
   - packages/skio_core
   - packages/skio_usb_serial
   - packages/skio_usb_serial/example
+  - packages/uvc_camera
