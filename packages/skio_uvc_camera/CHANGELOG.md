@@ -1,14 +1,18 @@
-## 0.1.0-beta.3
+## 0.1.0
 
+First stable release.
+
+- Verified on a POCO M7 5G (Android 16) with a Sonix UVC camera
+  (0c45:64ab): listing, permissions, 1280x720 MJPEG preview, JPEG capture,
+  the snapshot button, background and resume, and unplug and replug.
 - README rewritten: every feature explained with an example, including how
   to choose the resolution, plus an errors table, troubleshooting, tested
   hardware and limitations.
 - Example: text labels on every button (Size, Refresh, Capture), a layout
   that fits phone screens, and a guide to each control in its README.
-- Includes the hardware-button crash fix below (0.1.0-beta.2 was not
-  published separately).
+- Includes the snapshot-button crash fix below.
 
-## 0.1.0-beta.2
+## 0.1.0-beta.2 (not published separately)
 
 - Fix a crash on Android when the camera's hardware button is pressed. The
   UVC library calls the button callback directly from native code, which
