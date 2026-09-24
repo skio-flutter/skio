@@ -1,3 +1,12 @@
+## 0.1.1
+
+- README rewritten: every feature explained with an example (finding and
+  picking ports, permission, settings, receiving, line reading, sending,
+  DTR/RTS, plug events, closing), plus an errors table, troubleshooting,
+  tested hardware and limitations.
+- Example: text labels on every button, a layout that fits phone screens,
+  and a guide to each control in its README.
+
 ## 0.1.0
 
 First stable release. No API changes since 0.1.0-beta.1.

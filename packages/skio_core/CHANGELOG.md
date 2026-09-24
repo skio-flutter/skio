@@ -1,3 +1,9 @@
+## 0.1.1
+
+- README rewritten to explain every part in plain words: permissions,
+  error types, device filters, plug events and logging, with tables and
+  examples.
+
 ## 0.1.0
 
 First stable release. No API changes since 0.1.0-beta.1.

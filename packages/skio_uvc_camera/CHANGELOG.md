@@ -1,3 +1,13 @@
+## 0.1.0-beta.3
+
+- README rewritten: every feature explained with an example, including how
+  to choose the resolution, plus an errors table, troubleshooting, tested
+  hardware and limitations.
+- Example: text labels on every button (Size, Refresh, Capture), a layout
+  that fits phone screens, and a guide to each control in its README.
+- Includes the hardware-button crash fix below (0.1.0-beta.2 was not
+  published separately).
+
 ## 0.1.0-beta.2
 
 - Fix a crash on Android when the camera's hardware button is pressed. The

@@ -378,28 +378,29 @@ class _TerminalPageState extends State<TerminalPage> {
     final connected = _port != null;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Serial terminal'),
+        title: const Text('Terminal'),
         actions: [
-          IconButton(
-            tooltip: _showHex ? 'Show text' : 'Show hex',
-            icon: Icon(_showHex ? Icons.text_fields : Icons.hexagon_outlined),
+          // Text labels next to the icons, so every button explains itself.
+          TextButton.icon(
             onPressed: () => setState(() => _showHex = !_showHex),
+            icon: Icon(_showHex ? Icons.text_fields : Icons.hexagon_outlined),
+            label: Text(_showHex ? 'Text' : 'Hex'),
           ),
-          IconButton(
-            tooltip: 'Clear',
-            icon: const Icon(Icons.delete_sweep_outlined),
+          TextButton.icon(
             onPressed: () => setState(() {
               _received.clear();
               _rxBytes = 0;
               _txBytes = 0;
             }),
+            icon: const Icon(Icons.delete_sweep_outlined),
+            label: const Text('Clear'),
           ),
-          IconButton(
-            tooltip: 'Logs',
-            icon: const Icon(Icons.bug_report_outlined),
+          TextButton.icon(
             onPressed: () => Navigator.of(
               context,
             ).push(MaterialPageRoute<void>(builder: (_) => const LogsPage())),
+            icon: const Icon(Icons.bug_report_outlined),
+            label: const Text('Logs'),
           ),
         ],
       ),
@@ -420,57 +421,76 @@ class _TerminalPageState extends State<TerminalPage> {
     );
   }
 
-  Widget _connectionBar(bool connected) => Padding(
-    padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-    child: Row(
-      children: [
-        Expanded(
-          child: DropdownButtonFormField<DeviceHandle>(
-            initialValue: _selected,
-            isExpanded: true,
-            decoration: InputDecoration(
-              labelText: 'Port',
-              border: const OutlineInputBorder(),
-              isDense: true,
-              helperText: _chooser ? 'Ports this site may use' : null,
-            ),
-            hint: Text(_chooser ? 'No port chosen yet' : 'No ports found'),
-            items: [
-              for (final d in _devices)
-                DropdownMenuItem(
-                  value: d,
-                  child: Text(_label(d), overflow: TextOverflow.ellipsis),
-                ),
-            ],
-            onChanged: connected ? null : (d) => setState(() => _selected = d),
+  Widget _connectionBar(bool connected) {
+    final picker = DropdownButtonFormField<DeviceHandle>(
+      initialValue: _selected,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: 'Port',
+        border: const OutlineInputBorder(),
+        isDense: true,
+        helperText: _chooser ? 'Ports this site may use' : null,
+      ),
+      hint: Text(_chooser ? 'No port chosen yet' : 'No ports found'),
+      items: [
+        for (final d in _devices)
+          DropdownMenuItem(
+            value: d,
+            child: Text(_label(d), overflow: TextOverflow.ellipsis),
           ),
-        ),
-        const SizedBox(width: 8),
-        if (_chooser)
-          OutlinedButton.icon(
-            onPressed: connected || !_supported ? null : _pickPort,
-            icon: const Icon(Icons.usb),
-            label: const Text('Choose port'),
-          )
-        else
-          IconButton.outlined(
-            tooltip: 'Refresh',
-            onPressed: connected ? null : _refresh,
-            icon: const Icon(Icons.refresh),
-          ),
-        const SizedBox(width: 8),
-        connected
-            ? FilledButton.tonal(
-                onPressed: _disconnect,
-                child: const Text('Disconnect'),
-              )
-            : FilledButton(
-                onPressed: _selected == null || _connecting ? null : _connect,
-                child: Text(_connecting ? 'Connecting…' : 'Connect'),
-              ),
       ],
-    ),
-  );
+      onChanged: connected ? null : (d) => setState(() => _selected = d),
+    );
+    final buttons = [
+      if (_chooser)
+        OutlinedButton.icon(
+          onPressed: connected || !_supported ? null : _pickPort,
+          icon: const Icon(Icons.usb),
+          label: const Text('Choose port'),
+        )
+      else
+        OutlinedButton.icon(
+          onPressed: connected ? null : _refresh,
+          icon: const Icon(Icons.refresh),
+          label: const Text('Refresh'),
+        ),
+      const SizedBox(width: 8),
+      connected
+          ? FilledButton.tonal(
+              onPressed: _disconnect,
+              child: const Text('Disconnect'),
+            )
+          : FilledButton(
+              onPressed: _selected == null || _connecting ? null : _connect,
+              child: Text(_connecting ? 'Connecting…' : 'Connect'),
+            ),
+    ];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      // On narrow screens the buttons go below the port box so its text
+      // stays readable.
+      child: LayoutBuilder(
+        builder: (context, constraints) => constraints.maxWidth < 560
+            ? Column(
+                children: [
+                  picker,
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: buttons,
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(child: picker),
+                  const SizedBox(width: 8),
+                  ...buttons,
+                ],
+              ),
+      ),
+    );
+  }
 
   Widget _problemBanner(Problem problem) {
     final scheme = Theme.of(context).colorScheme;
@@ -657,10 +677,10 @@ class _TerminalPageState extends State<TerminalPage> {
           }),
         ),
         const SizedBox(width: 8),
-        IconButton.filled(
-          tooltip: 'Send',
+        FilledButton.icon(
           onPressed: connected ? _send : null,
           icon: const Icon(Icons.send),
+          label: const Text('Send'),
         ),
       ],
     ),
@@ -712,7 +732,7 @@ class _Help extends StatelessWidget {
           ),
         const SizedBox(height: 8),
         Text(
-          'Something not working? Open Logs (bug icon) and copy the log '
+          'Something not working? Tap Logs and copy the log '
           'into your bug report.',
           style: theme.textTheme.bodySmall,
         ),
@@ -759,8 +779,8 @@ class LogsPage extends StatelessWidget {
                 if (l != null) logBook.setLevel(l);
               },
             ),
-            IconButton(
-              tooltip: 'Copy all',
+            TextButton.icon(
+              label: const Text('Copy'),
               icon: const Icon(Icons.copy_all_outlined),
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: logBook.asText()));
@@ -771,8 +791,8 @@ class LogsPage extends StatelessWidget {
                 }
               },
             ),
-            IconButton(
-              tooltip: 'Clear',
+            TextButton.icon(
+              label: const Text('Clear'),
               icon: const Icon(Icons.delete_sweep_outlined),
               onPressed: logBook.clear,
             ),
