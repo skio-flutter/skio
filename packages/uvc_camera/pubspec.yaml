@@ -2,7 +2,7 @@ name: uvc_camera
 description: >-
   USB Video Class (UVC) camera for Flutter on Android (USB OTG) and web:
   live preview, JPEG capture and the camera's hardware button. Part of skio.
-version: 0.1.0-dev
+version: 0.1.0-beta.1
 repository: https://github.com/skio-flutter/skio/tree/main/packages/uvc_camera
 issue_tracker: https://github.com/skio-flutter/skio/issues
 topics:

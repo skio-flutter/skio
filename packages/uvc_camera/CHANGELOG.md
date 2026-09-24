@@ -1,4 +1,9 @@
-## 0.1.0-dev
+## 0.1.0-beta.1
+
+First beta. The API may still change before 0.1.0. Android and web
+backends are verified on an emulator and in Chromium, but not yet with a
+real UVC camera; please report results with `SkioLog` output.
+
 
 - `UvcCamera`: list devices, open with preferred sizes, live preview through
   `UvcPreview`, JPEG capture (a double-tap produces one image), hardware
