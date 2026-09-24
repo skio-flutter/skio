@@ -3061,6 +3061,241 @@ final class $JpegCapture$Type$ extends jni$_.JType<JpegCapture> {
   String get signature => r'Ldev/skio/uvc_camera/JpegCapture;';
 }
 
+/// from: `dev.skio.uvc_camera.ButtonForwarder$Listener`
+extension type ButtonForwarder$Listener._(jni$_.JObject _$this)
+    implements jni$_.JObject {
+  static final _class = jni$_.JClass.forName(
+    r'dev/skio/uvc_camera/ButtonForwarder$Listener',
+  );
+
+  /// The type which includes information such as the signature of this class.
+  static const jni$_.JType<ButtonForwarder$Listener> type =
+      $ButtonForwarder$Listener$Type$();
+
+  /// Maps a specific port to the implemented interface.
+  static final core$_.Map<core$_.int, $ButtonForwarder$Listener> _$impls = {};
+  static jni$_.JObjectPtr _$invoke(
+    core$_.int port,
+    jni$_.JObjectPtr descriptor,
+    jni$_.JObjectPtr args,
+  ) {
+    return _$invokeMethod(
+      port,
+      jni$_.MethodInvocation.fromAddresses(0, descriptor.address, args.address),
+    );
+  }
+
+  static final jni$_.Pointer<
+    jni$_.NativeFunction<
+      jni$_.JObjectPtr Function(jni$_.Int64, jni$_.JObjectPtr, jni$_.JObjectPtr)
+    >
+  >
+  _$invokePointer = jni$_.Pointer.fromFunction(_$invoke);
+
+  static jni$_.Pointer<jni$_.Void> _$invokeMethod(
+    core$_.int $p,
+    jni$_.MethodInvocation $i,
+  ) {
+    try {
+      final $d = $i.methodDescriptor.toDartString(releaseOriginal: true);
+      final $a = $i.args;
+      if ($d == r'onButton(II)V') {
+        _$impls[$p]!.onButton(
+          ($a![0] as jni$_.JInteger).toDartInt(releaseOriginal: true),
+          ($a![1] as jni$_.JInteger).toDartInt(releaseOriginal: true),
+        );
+        return jni$_.nullptr;
+      }
+    } catch (e) {
+      return jni$_.ProtectedJniExtensions.newDartException(e);
+    }
+    return jni$_.nullptr;
+  }
+
+  static void implementIn(
+    jni$_.JImplementer implementer,
+    $ButtonForwarder$Listener $impl,
+  ) {
+    late final jni$_.RawReceivePort $p;
+    $p = jni$_.RawReceivePort(($m) {
+      if ($m == null) {
+        _$impls.remove($p.sendPort.nativePort);
+        $p.close();
+        return;
+      }
+      final $i = jni$_.MethodInvocation.fromMessage($m);
+      final $r = _$invokeMethod($p.sendPort.nativePort, $i);
+      $i.args?.release();
+      jni$_.ProtectedJniExtensions.returnResult($i.result, $r);
+    });
+    implementer.add(
+      r'dev.skio.uvc_camera.ButtonForwarder$Listener',
+      $p,
+      _$invokePointer,
+      [if ($impl.onButton$async) r'onButton(II)V'],
+    );
+    final $a = $p.sendPort.nativePort;
+    _$impls[$a] = $impl;
+  }
+
+  factory ButtonForwarder$Listener.implement($ButtonForwarder$Listener $impl) {
+    final $i = jni$_.JImplementer();
+    implementIn($i, $impl);
+    return $i.implement<ButtonForwarder$Listener>();
+  }
+}
+
+extension ButtonForwarder$Listener$$Methods on ButtonForwarder$Listener {
+  static final _id_onButton = ButtonForwarder$Listener._class.instanceMethodId(
+    r'onButton',
+    r'(II)V',
+  );
+
+  static final _onButton =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JThrowablePtr Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<(jni$_.Int32, jni$_.Int32)>,
+              )
+            >
+          >('globalEnv_CallVoidMethod')
+          .asFunction<
+            jni$_.JThrowablePtr Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              core$_.int,
+              core$_.int,
+            )
+          >();
+
+  /// from: `public abstract void onButton(int i, int i1)`
+  void onButton(core$_.int i, core$_.int i1) {
+    final _$$selfRef = reference;
+    _onButton(_$$selfRef.pointer, _id_onButton.pointer, i, i1).check();
+  }
+}
+
+abstract base mixin class $ButtonForwarder$Listener {
+  factory $ButtonForwarder$Listener({
+    required void Function(core$_.int i, core$_.int i1) onButton,
+    core$_.bool onButton$async,
+  }) = _$ButtonForwarder$Listener;
+
+  void onButton(core$_.int i, core$_.int i1);
+  core$_.bool get onButton$async => false;
+}
+
+final class _$ButtonForwarder$Listener with $ButtonForwarder$Listener {
+  _$ButtonForwarder$Listener({
+    required void Function(core$_.int i, core$_.int i1) onButton,
+    this.onButton$async = false,
+  }) : _onButton = onButton;
+
+  final void Function(core$_.int i, core$_.int i1) _onButton;
+  final core$_.bool onButton$async;
+
+  void onButton(core$_.int i, core$_.int i1) {
+    return _onButton(i, i1);
+  }
+}
+
+final class $ButtonForwarder$Listener$Type$
+    extends jni$_.JType<ButtonForwarder$Listener> {
+  @jni$_.internal
+  const $ButtonForwarder$Listener$Type$();
+
+  @jni$_.internal
+  @core$_.override
+  String get signature => r'Ldev/skio/uvc_camera/ButtonForwarder$Listener;';
+}
+
+/// from: `dev.skio.uvc_camera.ButtonForwarder`
+extension type ButtonForwarder._(jni$_.JObject _$this)
+    implements jni$_.JObject, IButtonCallback {
+  static final _class = jni$_.JClass.forName(
+    r'dev/skio/uvc_camera/ButtonForwarder',
+  );
+
+  /// The type which includes information such as the signature of this class.
+  static const jni$_.JType<ButtonForwarder> type = $ButtonForwarder$Type$();
+  static final _id_new$ = _class.constructorId(
+    r'(Ldev/skio/uvc_camera/ButtonForwarder$Listener;)V',
+  );
+
+  static final _new$ =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<(jni$_.Pointer<jni$_.Void>,)>,
+              )
+            >
+          >('globalEnv_NewObject')
+          .asFunction<
+            jni$_.JniResult Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              jni$_.Pointer<jni$_.Void>,
+            )
+          >();
+
+  /// from: `public void <init>(dev.skio.uvc_camera.ButtonForwarder$Listener listener)`
+  /// The returned object must be released after use, by calling the [release] method.
+  factory ButtonForwarder(ButtonForwarder$Listener? listener) {
+    final _$$classRef = _class.reference;
+    final _$listener = listener?.reference ?? jni$_.jNullReference;
+    return _new$(
+      _$$classRef.pointer,
+      _id_new$.pointer,
+      _$listener.pointer,
+    ).object<ButtonForwarder>();
+  }
+}
+
+extension ButtonForwarder$$Methods on ButtonForwarder {
+  static final _id_onButton = ButtonForwarder._class.instanceMethodId(
+    r'onButton',
+    r'(II)V',
+  );
+
+  static final _onButton =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JThrowablePtr Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<(jni$_.Int32, jni$_.Int32)>,
+              )
+            >
+          >('globalEnv_CallVoidMethod')
+          .asFunction<
+            jni$_.JThrowablePtr Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              core$_.int,
+              core$_.int,
+            )
+          >();
+
+  /// from: `public abstract void onButton(int i, int i1)`
+  void onButton(core$_.int i, core$_.int i1) {
+    final _$$selfRef = reference;
+    _onButton(_$$selfRef.pointer, _id_onButton.pointer, i, i1).check();
+  }
+}
+
+final class $ButtonForwarder$Type$ extends jni$_.JType<ButtonForwarder> {
+  @jni$_.internal
+  const $ButtonForwarder$Type$();
+
+  @jni$_.internal
+  @core$_.override
+  String get signature => r'Ldev/skio/uvc_camera/ButtonForwarder;';
+}
+
 /// from: `android.os.Parcelable`
 ///
 /// WARNING: Parcelable is a stub. To generate bindings for this class, include

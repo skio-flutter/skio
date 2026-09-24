@@ -430,7 +430,8 @@ final class _AndroidUvcSession implements UvcCameraSession {
 
   late final a.UvcPreviewTexture _texture;
   late final int _textureId;
-  a.IButtonCallback? _buttonCallback;
+  a.ButtonForwarder? _buttonCallback;
+  a.ButtonForwarder$Listener? _buttonListener;
   final _buttons = StreamController<int>.broadcast();
   final _status = StreamController<UvcCameraStatus>.broadcast();
   bool _closed = false;
@@ -461,15 +462,19 @@ final class _AndroidUvcSession implements UvcCameraSession {
       listener,
     );
     _textureId = _texture.id();
-    final callback = _buttonCallback = a.IButtonCallback.implement(
-      a.$IButtonCallback(
-        onButton: (button, state) {
-          if (!_closed) _buttons.add(state);
-        },
-        onButton$async: true,
-      ),
-    );
-    _camera.buttonCallback = callback;
+    // The native library calls the button callback directly from C++, which
+    // must not be a Dart-implemented object; ButtonForwarder is plain Java.
+    final buttonListener = _buttonListener =
+        a.ButtonForwarder$Listener.implement(
+          a.$ButtonForwarder$Listener(
+            onButton: (button, state) {
+              if (!_closed) _buttons.add(state);
+            },
+            onButton$async: true,
+          ),
+        );
+    final forwarder = _buttonCallback = a.ButtonForwarder(buttonListener);
+    _camera.buttonCallback = forwarder.as(a.IButtonCallback.type);
     try {
       _texture.start();
     } on JThrowable catch (e) {
@@ -571,6 +576,7 @@ final class _AndroidUvcSession implements UvcCameraSession {
     }
     _camera.release();
     _buttonCallback?.release();
+    _buttonListener?.release();
     await _buttons.close();
     await _status.close();
   }

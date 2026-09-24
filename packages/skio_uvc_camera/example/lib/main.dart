@@ -3,12 +3,21 @@
 // Works with UVC cameras such as endoscopes, microscopes, inspection cameras
 // and USB webcams, on Android over USB OTG and in the browser.
 import 'dart:async';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:skio_uvc_camera/skio_uvc_camera.dart';
 
-void main() => runApp(const ViewerApp());
+import 'delete_file.dart';
+
+void main() {
+  // Log skio events in debug builds (see `flutter logs`).
+  if (kDebugMode) {
+    SkioLog.level = LogLevel.debug;
+    SkioLog.records.listen((r) => debugPrint('$r'));
+  }
+  runApp(const ViewerApp());
+}
 
 class ViewerApp extends StatelessWidget {
   const ViewerApp({super.key});
@@ -45,7 +54,7 @@ class _ViewerPageState extends State<ViewerPage> {
   UvcCamera? _camera;
   UvcSize? _size;
   bool _busy = false;
-  final _shots = <Uint8List>[];
+  final _shots = <Shot>[];
   StreamSubscription<DeviceEvent>? _events;
   StreamSubscription<void>? _button;
 
@@ -132,10 +141,58 @@ class _ViewerPageState extends State<ViewerPage> {
     try {
       final file = await camera.capture(quality: 90);
       final bytes = await file.readAsBytes();
-      if (mounted) setState(() => _shots.insert(0, bytes));
+      if (mounted) setState(() => _shots.insert(0, Shot(file.path, bytes)));
     } on HardwareException catch (e) {
       _toast(e.message);
     }
+  }
+
+  Future<void> _delete(Shot shot) async {
+    setState(() => _shots.remove(shot));
+    try {
+      await deleteCapturedFile(shot.path);
+    } on Exception catch (e) {
+      _toast('Could not delete the file: $e');
+    }
+  }
+
+  Future<void> _view(Shot shot) async {
+    final delete = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(child: Image.memory(shot.bytes, fit: BoxFit.contain)),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      shot.path.split('/').last,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Close'),
+                  ),
+                  FilledButton.tonalIcon(
+                    onPressed: () => Navigator.pop(context, true),
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text('Delete'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (delete ?? false) await _delete(shot);
   }
 
   void _toast(String message) {
@@ -245,12 +302,15 @@ class _ViewerPageState extends State<ViewerPage> {
               height: 88,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.all(8),
+                // Room on the right so the capture button doesn't cover the
+                // last thumbnail.
+                padding: const EdgeInsets.fromLTRB(8, 8, 88, 8),
                 itemCount: _shots.length,
                 separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (_, i) => ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.memory(_shots[i], fit: BoxFit.cover, width: 96),
+                itemBuilder: (_, i) => _Thumbnail(
+                  shot: _shots[i],
+                  onTap: () => _view(_shots[i]),
+                  onDelete: () => _delete(_shots[i]),
                 ),
               ),
             ),
@@ -266,4 +326,60 @@ class _ViewerPageState extends State<ViewerPage> {
             ),
     );
   }
+}
+
+/// A captured photo: where it was saved and its bytes for display.
+class Shot {
+  Shot(this.path, this.bytes);
+
+  final String path;
+  final Uint8List bytes;
+}
+
+class _Thumbnail extends StatelessWidget {
+  const _Thumbnail({
+    required this.shot,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  final Shot shot;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 96,
+    child: Stack(
+      fit: StackFit.expand,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Material(
+            child: Ink.image(
+              image: MemoryImage(shot.bytes),
+              fit: BoxFit.cover,
+              child: InkWell(onTap: onTap),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 2,
+          right: 2,
+          child: Material(
+            color: Colors.black54,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onDelete,
+              child: const Padding(
+                padding: EdgeInsets.all(4),
+                child: Icon(Icons.close, size: 16, color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

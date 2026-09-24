@@ -1,3 +1,15 @@
+## 0.1.0-beta.2
+
+- Fix a crash on Android when the camera's hardware button is pressed. The
+  UVC library calls the button callback directly from native code, which
+  must be a plain Java object; a small `ButtonForwarder` class now receives
+  it and forwards to Dart.
+- Verified on a POCO M7 5G (Android 16) with a Sonix UVC camera
+  (0c45:64ab): listing, permissions, 1280x720 MJPEG preview, JPEG capture,
+  hardware button, background/resume and unplug/replug.
+- Example: delete photos from the thumbnail strip or the full-size viewer;
+  debug builds print skio logs.
+
 ## 0.1.0-beta.1
 
 First beta. The API may still change before 0.1.0. Android and web
