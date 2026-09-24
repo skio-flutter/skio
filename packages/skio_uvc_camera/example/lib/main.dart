@@ -209,6 +209,66 @@ class _ViewerPageState extends State<ViewerPage> {
     return '${d.name ?? 'USB camera'}$ids';
   }
 
+  Widget _cameraBar(UvcCamera? camera) {
+    final picker = DropdownButtonFormField<DeviceHandle>(
+      initialValue: _selected,
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'Camera',
+        border: OutlineInputBorder(),
+        isDense: true,
+      ),
+      hint: const Text('No cameras found'),
+      items: [
+        for (final d in _cameras)
+          DropdownMenuItem(
+            value: d,
+            child: Text(_label(d), overflow: TextOverflow.ellipsis),
+          ),
+      ],
+      onChanged: camera == null ? (d) => setState(() => _selected = d) : null,
+    );
+    final buttons = [
+      OutlinedButton.icon(
+        onPressed: camera == null ? _refresh : null,
+        icon: const Icon(Icons.refresh),
+        label: const Text('Refresh'),
+      ),
+      const SizedBox(width: 8),
+      camera == null
+          ? FilledButton(
+              onPressed: _selected == null || _busy ? null : _open,
+              child: const Text('Open'),
+            )
+          : FilledButton.tonal(onPressed: _close, child: const Text('Close')),
+    ];
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      // On narrow screens the buttons go below the camera box so its name
+      // stays readable.
+      child: LayoutBuilder(
+        builder: (context, constraints) => constraints.maxWidth < 560
+            ? Column(
+                children: [
+                  picker,
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: buttons,
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(child: picker),
+                  const SizedBox(width: 8),
+                  ...buttons,
+                ],
+              ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final camera = _camera;
@@ -219,7 +279,6 @@ class _ViewerPageState extends State<ViewerPage> {
           if (camera != null)
             PopupMenuButton<UvcSize>(
               tooltip: 'Preview size',
-              icon: const Icon(Icons.aspect_ratio),
               onSelected: _reopenAt,
               itemBuilder: (_) => [
                 for (final s in camera.supportedSizes)
@@ -229,54 +288,24 @@ class _ViewerPageState extends State<ViewerPage> {
                     child: Text('$s'),
                   ),
               ],
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.aspect_ratio),
+                    SizedBox(width: 6),
+                    Text('Size'),
+                  ],
+                ),
+              ),
             ),
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<DeviceHandle>(
-                      initialValue: _selected,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Camera',
-                        border: OutlineInputBorder(),
-                        isDense: true,
-                      ),
-                      hint: const Text('No cameras found'),
-                      items: [
-                        for (final d in _cameras)
-                          DropdownMenuItem(value: d, child: Text(_label(d))),
-                      ],
-                      onChanged: camera == null
-                          ? (d) => setState(() => _selected = d)
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton.outlined(
-                    tooltip: 'Refresh',
-                    onPressed: camera == null ? _refresh : null,
-                    icon: const Icon(Icons.refresh),
-                  ),
-                  const SizedBox(width: 8),
-                  camera == null
-                      ? FilledButton(
-                          onPressed: _selected == null || _busy ? null : _open,
-                          child: const Text('Open'),
-                        )
-                      : FilledButton.tonal(
-                          onPressed: _close,
-                          child: const Text('Close'),
-                        ),
-                ],
-              ),
-            ),
+            _cameraBar(camera),
             Expanded(
               child: ColoredBox(
                 color: Colors.black,
@@ -304,7 +333,7 @@ class _ViewerPageState extends State<ViewerPage> {
                 scrollDirection: Axis.horizontal,
                 // Room on the right so the capture button doesn't cover the
                 // last thumbnail.
-                padding: const EdgeInsets.fromLTRB(8, 8, 88, 8),
+                padding: const EdgeInsets.fromLTRB(8, 8, 150, 8),
                 itemCount: _shots.length,
                 separatorBuilder: (_, _) => const SizedBox(width: 8),
                 itemBuilder: (_, i) => _Thumbnail(
@@ -319,10 +348,10 @@ class _ViewerPageState extends State<ViewerPage> {
       ),
       floatingActionButton: camera == null
           ? null
-          : FloatingActionButton(
-              tooltip: 'Capture',
+          : FloatingActionButton.extended(
               onPressed: _capture,
-              child: const Icon(Icons.camera_alt),
+              icon: const Icon(Icons.camera_alt),
+              label: const Text('Capture'),
             ),
     );
   }
