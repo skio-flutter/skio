@@ -1,8 +1,8 @@
 # skio_core
 
 Shared pure-Dart types for the skio Flutter hardware plugins: one permission
-API, one error family and one way to match devices across USB serial, UVC
-cameras and Bluetooth LE. No Flutter dependency and no platform code.
+API, one error family and one way to match devices across USB serial and
+UVC cameras. No Flutter dependency and no platform code.
 
 You normally don't depend on this package directly. Each skio plugin
 re-exports it.
@@ -41,7 +41,6 @@ try {
 | --- | --- |
 | `skio_core` | Shared types (this package) |
 | `skio_usb_serial` | USB serial port: Android USB OTG, Web Serial |
-| `skio_uvc_camera` | USB Video Class camera on Android |
-| `skio_ble_central` | Bluetooth LE central: Android, Web Bluetooth |
+| `uvc_camera` | USB Video Class camera on Android |
 
 Source and issues: [github.com/skio-flutter/skio](https://github.com/skio-flutter/skio).

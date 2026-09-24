@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>skio: Flutter hardware plugins</title>
-<meta name="description" content="skio is a family of open-source Flutter plugins for USB serial, UVC cameras and Bluetooth LE, using direct native bindings instead of platform channels.">
+<meta name="description" content="skio is a family of open-source Flutter plugins for USB serial devices and UVC cameras, using direct native bindings instead of platform channels.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230f766e'/><text x='16' y='22' font-family='monospace' font-size='16' font-weight='700' fill='white' text-anchor='middle'>io</text></svg>">
 <style>
   :root {
@@ -40,7 +40,7 @@
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn:hover { text-decoration: none; opacity: .9; }
   h2 { font-size: 24px; margin: 56px 0 16px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
   .card h3 { margin: 0 0 6px; font-size: 16px; }
   .card p { margin: 0 0 12px; color: var(--muted); font-size: 14.5px; }
@@ -75,7 +75,7 @@
 
   <section class="hero">
     <h1>Flutter plugins for real hardware.</h1>
-    <p>skio connects Flutter apps to USB serial devices, USB cameras and Bluetooth LE sensors.
+    <p>skio connects Flutter apps to USB serial devices and USB cameras.
       It binds native APIs directly with jnigen and <code>dart:js_interop</code>, so there are
       no platform channels, and the logic lives in testable Dart.</p>
     <a class="btn primary" href="https://github.com/skio-flutter/skio">View on GitHub</a>
@@ -90,13 +90,8 @@
       <span class="tag">In development</span>
     </div>
     <div class="card">
-      <h3 class="mono">skio_uvc_camera</h3>
+      <h3 class="mono">uvc_camera</h3>
       <p>USB Video Class cameras on Android: live preview, JPEG capture, hardware button.</p>
-      <span class="tag planned">Planned</span>
-    </div>
-    <div class="card">
-      <h3 class="mono">skio_ble_central</h3>
-      <p>Bluetooth LE central: scan, connect, GATT read/write/notify. Android and Web Bluetooth.</p>
       <span class="tag planned">Planned</span>
     </div>
     <div class="card">
@@ -119,7 +114,7 @@ await port.close();</code></pre>
   <ul class="principles">
     <li><b>Direct native bindings</b><span>jnigen, ffigen and js_interop. No MethodChannels, typed calls end to end.</span></li>
     <li><b>Logic in Dart</b><span>Queues, framing, timeouts and retries are Dart code you can unit-test without a device.</span></li>
-    <li><b>Same API everywhere</b><span>One permission flow and one error type across USB, camera and Bluetooth.</span></li>
+    <li><b>Same API everywhere</b><span>One permission flow and one error type across USB serial and camera.</span></li>
     <li><b>Transports, not drivers</b><span>Device protocols stay in your app, so any compatible device works.</span></li>
     <li><b>No telemetry</b><span>No network access, no tracking. Your data stays where your app puts it.</span></li>
     <li><b>Free and open</b><span>BSD-3-Clause licence, free for personal and commercial use.</span></li>
