@@ -1,7 +1,8 @@
 // A general-purpose USB serial terminal built on skio_usb_serial.
 //
 // Works with any USB serial adapter or board (CP210x, CH340, FTDI, CDC-ACM,
-// Arduino, ESP32, ...) on Android over USB OTG and in desktop Chrome/Edge.
+// Arduino, ESP32, ...) on Android over USB OTG, on macOS, and in desktop
+// Chrome/Edge.
 // The Logs page shows skio's own log, so problems can be diagnosed on the
 // device without a debugger.
 import 'dart:async';
@@ -317,10 +318,16 @@ class _TerminalPageState extends State<TerminalPage> {
         kIsWeb
             ? 'Close other tabs or programs using the port (serial '
                   'monitors, Arduino IDE), then connect again.'
+            : _isMacOS
+            ? 'Quit other programs using the port (serial monitors, '
+                  'Arduino IDE, screen), then connect again.'
             : 'Another app is using the device. Unplug and replug it.',
       AccessDenied() =>
         kIsWeb
             ? 'Click "Choose port" and pick the adapter in the popup.'
+            : _isMacOS
+            ? 'Sandboxed apps need the com.apple.security.device.serial '
+                  'entitlement.'
             : 'Tap Connect again and allow the USB dialog.',
       DeviceNotFound() =>
         kIsWeb
@@ -704,6 +711,14 @@ class _Help extends StatelessWidget {
             'Set the baud rate your device uses, then click Connect.',
             'Chosen ports are remembered for this site next time.',
           ]
+        : _isMacOS
+        ? [
+            'Plug in your USB serial adapter or board.',
+            hasPorts
+                ? 'Pick it under Port and click Connect.'
+                : 'Click Refresh if it does not appear under Port.',
+            'Set the baud rate your device uses.',
+          ]
         : [
             'Plug in the adapter with a USB OTG cable or adapter.',
             hasPorts
@@ -843,3 +858,6 @@ class _LogLine extends StatelessWidget {
     );
   }
 }
+
+/// Whether the app runs as a native macOS app (not in a browser on a Mac).
+bool get _isMacOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;

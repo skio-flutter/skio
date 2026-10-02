@@ -2,17 +2,19 @@
 
 A complete serial terminal for any USB serial adapter or board: CH340,
 CP210x, FTDI, PL2303, Arduino, ESP32 and others. It runs on Android phones
-(with a USB OTG cable) and in desktop Chrome or Edge.
+(with a USB OTG cable), as a macOS app, and in desktop Chrome or Edge.
 
 ```bash
 flutter run            # Android phone with the device plugged in
+flutter run -d macos   # Mac app
 flutter run -d chrome  # browser (Chrome or Edge)
 ```
 
 ## Using it
 
 1. **Plug in** your adapter or board.
-2. **Android:** pick it under **Port** (tap **Refresh** if it isn't listed).
+2. **Android and macOS:** pick it under **Port** (tap **Refresh** if it
+   isn't listed).
    **Web:** click **Choose port** and pick it in the browser popup.
 3. Set **Baud** (and **Data**, **Parity**, **Stop** if your device needs
    something other than 8N1).
@@ -26,7 +28,7 @@ flutter run -d chrome  # browser (Chrome or Edge)
 | --- | --- |
 | **Port** | The serial port to use. On the web it lists ports you already picked for this site. |
 | **Choose port** (web) | Opens the browser's popup to pick a port. |
-| **Refresh** (Android) | Looks for newly plugged-in adapters. |
+| **Refresh** (Android, macOS) | Looks for newly plugged-in adapters. |
 | **Connect** / **Disconnect** | Opens or closes the port with the settings below. |
 | **Baud** | Speed; must match the device. 74880 shows ESP32/ESP8266 boot messages. |
 | **Data**, **Parity**, **Stop** | Line settings; 8, none, 1 (8N1) is what most devices use. |
@@ -51,3 +53,9 @@ doesn't work:
 - **Clear:** empties the log.
 
 In debug builds the log is also printed to the console (`flutter logs`).
+
+## macOS
+
+The example's `macos/Runner/*.entitlements` files include
+`com.apple.security.device.serial`, which sandboxed Mac apps need to open
+serial ports. Add the same key to your own app.

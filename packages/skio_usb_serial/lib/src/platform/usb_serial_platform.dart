@@ -5,7 +5,7 @@ import 'package:skio_core/skio_core.dart';
 import '../serial_config.dart';
 import 'default_platform.dart'
     if (dart.library.js_interop) '../web/usb_serial_web.dart'
-    if (dart.library.ffi) '../android/usb_serial_android.dart';
+    if (dart.library.ffi) 'native_platform.dart';
 
 /// The platform side of `skio_usb_serial`.
 ///

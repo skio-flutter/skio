@@ -38,17 +38,19 @@ final class UsbSerialPort {
   ///
   /// On Android, `requestAccess(device)` shows the system USB permission
   /// dialog for that device. On the web, `requestAccess()` without a device
-  /// opens the port chooser.
+  /// opens the port chooser. On macOS no permission is needed at runtime.
   static HardwareAccess get access => _platform;
 
   /// Whether ports must be picked in a system chooser with [request] before
-  /// [list] returns them. True on the web, false on Android.
+  /// [list] returns them. True on the web, false on Android and macOS.
   static bool get requiresUserSelection => _platform.requiresUserSelection;
 
   /// Serial ports that can be opened now, optionally narrowed by [filters].
   ///
   /// On Android these are all attached USB serial adapters (permission may
-  /// still be needed). On the web these are ports the user granted before.
+  /// still be needed). On macOS these are all attached USB serial ports, with
+  /// the `/dev/cu.*` path as the id. On the web these are ports the user
+  /// granted before.
   static Future<List<DeviceHandle>> list({
     List<DeviceFilter> filters = const [],
   }) async {

@@ -1,9 +1,9 @@
 name: skio_usb_serial
 description: >-
-  USB serial for Flutter on Android (USB OTG) and web (Web Serial): talk to
-  ESP32, Arduino, STM32 and CH340, CP210x, FTDI adapters. JNI, no platform
-  channels.
-version: 0.1.3
+  USB serial for Flutter on Android (USB OTG), macOS and web (Web Serial): talk
+  to ESP32, Arduino, STM32 and CH340, CP210x, FTDI adapters. JNI and FFI, no
+  platform channels.
+version: 0.2.0
 homepage: https://skio-flutter.dev
 repository: https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial
 issue_tracker: https://github.com/skio-flutter/skio/issues
@@ -13,6 +13,7 @@ topics:
   - esp32
   - web-serial
   - android
+  - macos
 
 environment:
   sdk: ^3.13.0
@@ -25,6 +26,7 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
+  ffi: ^2.1.0
   jni: ^1.0.3
   jni_flutter: ^1.0.3
   skio_core: ^0.1.0
@@ -35,6 +37,9 @@ flutter:
     platforms:
       android:
         ffiPlugin: true
+      macos:
+        dartPluginClass: MacosUsbSerialPlatform
+        dartFileName: src/macos/usb_serial_macos.dart
       web:
         pluginClass: UsbSerialWeb
         fileName: src/web/usb_serial_web.dart

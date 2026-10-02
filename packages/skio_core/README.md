@@ -107,7 +107,7 @@ A `DeviceHandle` describes one device:
 
 | Field | Meaning |
 | --- | --- |
-| `id` | Platform identifier, for example `/dev/bus/usb/001/003` on Android |
+| `id` | Platform identifier, for example `/dev/bus/usb/001/003` on Android or `/dev/cu.usbserial-110` on macOS |
 | `name` | The name the device reports, if any |
 | `vendorId`, `productId` | USB vendor and product IDs, for example `0x1a86` and `0x7523` for a CH340 |
 | `serialNumber` | Serial number, where the platform allows reading it |

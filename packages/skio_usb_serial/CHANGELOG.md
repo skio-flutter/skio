@@ -1,3 +1,17 @@
+## 0.2.0
+
+- **macOS support.** Lists USB serial ports through IOKit (with vendor,
+  product and serial number) and opens them with POSIX termios, all through
+  `dart:ffi`: no Swift, Objective-C or CocoaPods. Any baud rate, 5 to 8 data
+  bits, odd/even parity, 1 or 2 stop bits, RTS/CTS, DTR/DSR and XON/XOFF flow
+  control, DTR/RTS lines, plug and unplug events. Reading runs on a
+  background isolate; writes never block the UI. Other processes are kept
+  out of an open port, and opening the same port twice in one app throws
+  `DeviceBusy`.
+- Sandboxed macOS apps need the `com.apple.security.device.serial`
+  entitlement; without it `open` throws `AccessDenied` saying so.
+- Example: runs on macOS, with macOS-specific hints.
+
 ## 0.1.3
 
 - README: badges, a FAQ for common questions and a fair comparison with
