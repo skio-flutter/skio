@@ -10,6 +10,7 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
+  path_provider: ^2.1.6
   skio_uvc_camera:
     path: ../
 

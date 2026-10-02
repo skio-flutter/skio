@@ -347,8 +347,25 @@ final class _WebUvcSession implements UvcCameraSession {
   @override
   Stream<UvcCameraStatus> get status => _status.stream;
 
+  /// Browsers have no app folder to write to, so [directory] is ignored and
+  /// the photo is an in-memory file named [fileName].
   @override
-  Future<XFile> capture({required int quality}) async {
+  Future<XFile> capture({
+    required int quality,
+    String? directory,
+    String? fileName,
+  }) async {
+    final bytes = await captureBytes(quality: quality);
+    return XFile.fromData(
+      bytes,
+      mimeType: 'image/jpeg',
+      name: fileName ?? 'uvc_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      length: bytes.length,
+    );
+  }
+
+  @override
+  Future<Uint8List> captureBytes({required int quality}) async {
     if (_closed) throw Disconnected('Camera is closed', device: _device);
     final width = _video.videoWidth;
     final height = _video.videoHeight;
@@ -373,14 +390,7 @@ final class _WebUvcSession implements UvcCameraSession {
     if (result == null) {
       throw ProtocolError('JPEG encoding failed', device: _device);
     }
-    final bytes = (await result.arrayBuffer().toDart).toDart.asUint8List();
-    final name = 'uvc_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    return XFile.fromData(
-      Uint8List.fromList(bytes),
-      mimeType: 'image/jpeg',
-      name: name,
-      length: bytes.length,
-    );
+    return (await result.arrayBuffer().toDart).toDart.asUint8List();
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/widgets.dart';
 import 'package:skio_core/skio_core.dart';
@@ -69,7 +71,19 @@ abstract interface class UvcCameraSession {
   Stream<UvcCameraStatus> get status;
 
   /// Captures the next frame as JPEG with [quality] from 1 to 100.
-  Future<XFile> capture({required int quality});
+  ///
+  /// Writes to [directory] (default: a cache folder) as [fileName] (default:
+  /// a timestamped name). Platforms without a file system may ignore
+  /// [directory] and return an in-memory file named [fileName].
+  Future<XFile> capture({
+    required int quality,
+    String? directory,
+    String? fileName,
+  });
+
+  /// Captures the next frame as JPEG bytes with [quality] from 1 to 100,
+  /// without writing a file.
+  Future<Uint8List> captureBytes({required int quality});
 
   /// Stops the preview and releases the camera. Safe to call more than once.
   Future<void> close();

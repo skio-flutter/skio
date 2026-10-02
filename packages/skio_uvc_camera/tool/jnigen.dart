@@ -55,7 +55,7 @@ const _allow = <String, Set<String>>{
     'openAppSettings',
   },
   'dev.skio.uvc_camera.UvcPreviewTexture': {'<init>', 'id', 'start', 'release'},
-  'dev.skio.uvc_camera.JpegCapture': {'capture'},
+  'dev.skio.uvc_camera.JpegCapture': {'capture', 'captureBytes'},
   'dev.skio.uvc_camera.ButtonForwarder': {'<init>'},
 };
 

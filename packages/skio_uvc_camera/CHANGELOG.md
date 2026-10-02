@@ -1,3 +1,18 @@
+## 0.2.0
+
+- `capture(directory: ..., fileName: ...)` writes the JPEG straight to your
+  own folder and file name, so apps no longer move photos out of the cache
+  folder. Without them, photos still go to the cache folder as before.
+- New `captureBytes()` returns the JPEG as a `Uint8List` without writing a
+  file, for uploading, displaying or saving with your own code.
+- A double tap still produces one image. Captures to a different file, and
+  `captureBytes`, wait for the running capture instead of interrupting it.
+- Android: a failed capture no longer leaves a partial JPEG file behind.
+- Platform interface: `UvcCameraSession.capture` takes `directory` and
+  `fileName`, and sessions implement `captureBytes`. Custom platform
+  implementations need both.
+- Example: a "Save to" menu (cache folder, app folder, memory only).
+
 ## 0.1.1
 
 - README: badges, a FAQ for common questions and a fair comparison with

@@ -2826,6 +2826,10 @@ extension type JpegCapture$Callback._(jni$_.JObject _$this)
         _$impls[$p]!.onCaptured(($a![0] as jni$_.JString?));
         return jni$_.nullptr;
       }
+      if ($d == r'onCapturedBytes([B)V') {
+        _$impls[$p]!.onCapturedBytes(($a![0] as jni$_.JByteArray?));
+        return jni$_.nullptr;
+      }
       if ($d == r'onError(Ljava/lang/String;)V') {
         _$impls[$p]!.onError(($a![0] as jni$_.JString?));
         return jni$_.nullptr;
@@ -2858,6 +2862,7 @@ extension type JpegCapture$Callback._(jni$_.JObject _$this)
       _$invokePointer,
       [
         if ($impl.onCaptured$async) r'onCaptured(Ljava/lang/String;)V',
+        if ($impl.onCapturedBytes$async) r'onCapturedBytes([B)V',
         if ($impl.onError$async) r'onError(Ljava/lang/String;)V',
       ],
     );
@@ -2907,6 +2912,38 @@ extension JpegCapture$Callback$$Methods on JpegCapture$Callback {
     ).check();
   }
 
+  static final _id_onCapturedBytes = JpegCapture$Callback._class
+      .instanceMethodId(r'onCapturedBytes', r'([B)V');
+
+  static final _onCapturedBytes =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JThrowablePtr Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<(jni$_.Pointer<jni$_.Void>,)>,
+              )
+            >
+          >('globalEnv_CallVoidMethod')
+          .asFunction<
+            jni$_.JThrowablePtr Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              jni$_.Pointer<jni$_.Void>,
+            )
+          >();
+
+  /// from: `public abstract void onCapturedBytes(byte[] bs)`
+  void onCapturedBytes(jni$_.JByteArray? bs) {
+    final _$$selfRef = reference;
+    final _$bs = bs?.reference ?? jni$_.jNullReference;
+    _onCapturedBytes(
+      _$$selfRef.pointer,
+      _id_onCapturedBytes.pointer,
+      _$bs.pointer,
+    ).check();
+  }
+
   static final _id_onError = JpegCapture$Callback._class.instanceMethodId(
     r'onError',
     r'(Ljava/lang/String;)V',
@@ -2942,12 +2979,16 @@ abstract base mixin class $JpegCapture$Callback {
   factory $JpegCapture$Callback({
     required void Function(jni$_.JString? string) onCaptured,
     core$_.bool onCaptured$async,
+    required void Function(jni$_.JByteArray? bs) onCapturedBytes,
+    core$_.bool onCapturedBytes$async,
     required void Function(jni$_.JString? string) onError,
     core$_.bool onError$async,
   }) = _$JpegCapture$Callback;
 
   void onCaptured(jni$_.JString? string);
   core$_.bool get onCaptured$async => false;
+  void onCapturedBytes(jni$_.JByteArray? bs);
+  core$_.bool get onCapturedBytes$async => false;
   void onError(jni$_.JString? string);
   core$_.bool get onError$async => false;
 }
@@ -2956,18 +2997,27 @@ final class _$JpegCapture$Callback with $JpegCapture$Callback {
   _$JpegCapture$Callback({
     required void Function(jni$_.JString? string) onCaptured,
     this.onCaptured$async = false,
+    required void Function(jni$_.JByteArray? bs) onCapturedBytes,
+    this.onCapturedBytes$async = false,
     required void Function(jni$_.JString? string) onError,
     this.onError$async = false,
   }) : _onCaptured = onCaptured,
+       _onCapturedBytes = onCapturedBytes,
        _onError = onError;
 
   final void Function(jni$_.JString? string) _onCaptured;
   final core$_.bool onCaptured$async;
+  final void Function(jni$_.JByteArray? bs) _onCapturedBytes;
+  final core$_.bool onCapturedBytes$async;
   final void Function(jni$_.JString? string) _onError;
   final core$_.bool onError$async;
 
   void onCaptured(jni$_.JString? string) {
     return _onCaptured(string);
+  }
+
+  void onCapturedBytes(jni$_.JByteArray? bs) {
+    return _onCapturedBytes(bs);
   }
 
   void onError(jni$_.JString? string) {
@@ -2996,10 +3046,77 @@ extension type JpegCapture._(jni$_.JObject _$this)
   static const jni$_.JType<JpegCapture> type = $JpegCapture$Type$();
   static final _id_capture = _class.staticMethodId(
     r'capture',
-    r'(Lcom/serenegiant/usb/UVCCamera;IIILdev/skio/uvc_camera/JpegCapture$Callback;)V',
+    r'(Lcom/serenegiant/usb/UVCCamera;IIILjava/lang/String;Ljava/lang/String;Ldev/skio/uvc_camera/JpegCapture$Callback;)V',
   );
 
   static final _capture =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JThrowablePtr Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<
+                  (
+                    jni$_.Pointer<jni$_.Void>,
+                    jni$_.Int32,
+                    jni$_.Int32,
+                    jni$_.Int32,
+                    jni$_.Pointer<jni$_.Void>,
+                    jni$_.Pointer<jni$_.Void>,
+                    jni$_.Pointer<jni$_.Void>,
+                  )
+                >,
+              )
+            >
+          >('globalEnv_CallStaticVoidMethod')
+          .asFunction<
+            jni$_.JThrowablePtr Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              jni$_.Pointer<jni$_.Void>,
+              core$_.int,
+              core$_.int,
+              core$_.int,
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.Pointer<jni$_.Void>,
+            )
+          >();
+
+  /// from: `static public void capture(com.serenegiant.usb.UVCCamera uVCCamera, int i, int i1, int i2, java.lang.String string, java.lang.String string1, dev.skio.uvc_camera.JpegCapture$Callback callback)`
+  static void capture(
+    UVCCamera? uVCCamera,
+    core$_.int i,
+    core$_.int i1,
+    core$_.int i2,
+    jni$_.JString? string,
+    jni$_.JString? string1,
+    JpegCapture$Callback? callback,
+  ) {
+    final _$$classRef = _class.reference;
+    final _$uVCCamera = uVCCamera?.reference ?? jni$_.jNullReference;
+    final _$string = string?.reference ?? jni$_.jNullReference;
+    final _$string1 = string1?.reference ?? jni$_.jNullReference;
+    final _$callback = callback?.reference ?? jni$_.jNullReference;
+    _capture(
+      _$$classRef.pointer,
+      _id_capture.pointer,
+      _$uVCCamera.pointer,
+      i,
+      i1,
+      i2,
+      _$string.pointer,
+      _$string1.pointer,
+      _$callback.pointer,
+    ).check();
+  }
+
+  static final _id_captureBytes = _class.staticMethodId(
+    r'captureBytes',
+    r'(Lcom/serenegiant/usb/UVCCamera;IIILdev/skio/uvc_camera/JpegCapture$Callback;)V',
+  );
+
+  static final _captureBytes =
       jni$_.ProtectedJniExtensions.lookup<
             jni$_.NativeFunction<
               jni$_.JThrowablePtr Function(
@@ -3029,8 +3146,8 @@ extension type JpegCapture._(jni$_.JObject _$this)
             )
           >();
 
-  /// from: `static public void capture(com.serenegiant.usb.UVCCamera uVCCamera, int i, int i1, int i2, dev.skio.uvc_camera.JpegCapture$Callback callback)`
-  static void capture(
+  /// from: `static public void captureBytes(com.serenegiant.usb.UVCCamera uVCCamera, int i, int i1, int i2, dev.skio.uvc_camera.JpegCapture$Callback callback)`
+  static void captureBytes(
     UVCCamera? uVCCamera,
     core$_.int i,
     core$_.int i1,
@@ -3040,9 +3157,9 @@ extension type JpegCapture._(jni$_.JObject _$this)
     final _$$classRef = _class.reference;
     final _$uVCCamera = uVCCamera?.reference ?? jni$_.jNullReference;
     final _$callback = callback?.reference ?? jni$_.jNullReference;
-    _capture(
+    _captureBytes(
       _$$classRef.pointer,
-      _id_capture.pointer,
+      _id_captureBytes.pointer,
       _$uVCCamera.pointer,
       i,
       i1,
