@@ -63,6 +63,80 @@ void main() {
     expect(() => c.capture(), throwsA(isA<Disconnected>()));
   });
 
+  test('capture writes to the given directory and file name', () async {
+    final c = await UvcCamera.open(cam);
+    final file = await c.capture(directory: '/data/photos', fileName: 'a.jpg');
+    expect(file.path, '/data/photos/a.jpg');
+    expect(platform.opened.single.calls, ['file 90 /data/photos a.jpg']);
+  });
+
+  test('capture rejects file names that leave the directory', () async {
+    final c = await UvcCamera.open(cam);
+    for (final bad in ['', '.', '..', '../a.jpg', 'x/a.jpg', r'x\a.jpg']) {
+      expect(
+        () => c.capture(directory: '/data', fileName: bad),
+        throwsArgumentError,
+        reason: bad,
+      );
+    }
+    expect(() => c.capture(directory: ''), throwsArgumentError);
+    expect(platform.opened.single.captures, 0);
+  });
+
+  test('captureBytes returns JPEG bytes without a file', () async {
+    final c = await UvcCamera.open(cam);
+    expect(await c.captureBytes(quality: 70), [0xff, 0xd8, 70]);
+    expect(platform.opened.single.calls, ['bytes 70']);
+  });
+
+  test('captureBytes validates quality and state', () async {
+    final c = await UvcCamera.open(cam);
+    expect(() => c.captureBytes(quality: 0), throwsArgumentError);
+    await c.close();
+    expect(() => c.captureBytes(), throwsA(isA<Disconnected>()));
+  });
+
+  test('concurrent captureBytes calls share one capture', () async {
+    final c = await UvcCamera.open(cam);
+    final session = platform.opened.single..captureGate = Completer<void>();
+    final a = c.captureBytes();
+    final b = c.captureBytes();
+    session.captureGate!.complete();
+    final results = await Future.wait([a, b]);
+    expect(identical(results[0], results[1]), isTrue);
+    expect(session.captures, 1);
+  });
+
+  test('different captures run one after another', () async {
+    final c = await UvcCamera.open(cam);
+    final session = platform.opened.single..captureGate = Completer<void>();
+    final file = c.capture(fileName: 'a.jpg');
+    final other = c.capture(fileName: 'b.jpg');
+    final bytes = c.captureBytes();
+    await pumpEventQueue();
+    expect(session.calls, ['file 90 null a.jpg']);
+    session.captureGate!.complete();
+    expect((await file).name, 'a.jpg');
+    expect((await other).name, 'b.jpg');
+    expect(await bytes, [0xff, 0xd8, 90]);
+    expect(session.calls, [
+      'file 90 null a.jpg',
+      'file 90 null b.jpg',
+      'bytes 90',
+    ]);
+  });
+
+  test('a failed capture does not block the next one', () async {
+    final c = await UvcCamera.open(cam);
+    final session = platform.opened.single..captureGate = Completer<void>();
+    final first = c.capture();
+    final next = c.captureBytes();
+    session.captureGate!.completeError(const ProtocolError('boom'));
+    await expectLater(first, throwsA(isA<ProtocolError>()));
+    session.captureGate = null;
+    expect(await next, [0xff, 0xd8, 90]);
+  });
+
   test('button presses are press-only and debounced', () async {
     final c = await UvcCamera.open(
       cam,

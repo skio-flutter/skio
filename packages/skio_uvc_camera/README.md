@@ -8,7 +8,8 @@
 Use **USB cameras** in a Flutter app: endoscopes, microscopes, inspection
 cameras, document cameras and ordinary USB webcams. These all follow the
 **USB Video Class (UVC)** standard. The package shows a **live preview**,
-takes **JPEG photos**, and reports presses of the camera's own **snapshot
+takes **JPEG photos** (saved straight to your own folder, or returned as
+bytes with no file), and reports presses of the camera's own **snapshot
 button**.
 
 Part of the [skio](https://github.com/skio-flutter/skio) family of Flutter
@@ -27,6 +28,8 @@ hardware plugins.
   - [Choose the resolution](#choose-the-resolution)
   - [Show the live preview](#show-the-live-preview)
   - [Take a photo](#take-a-photo)
+  - [Save photos to your own folder](#save-photos-to-your-own-folder)
+  - [Get photo bytes without a file](#get-photo-bytes-without-a-file)
   - [Use the camera's snapshot button](#use-the-cameras-snapshot-button)
   - [Know when the camera stops or is unplugged](#know-when-the-camera-stops-or-is-unplugged)
   - [Close the camera](#close-the-camera)
@@ -46,7 +49,8 @@ hardware plugins.
 | --- | --- | --- |
 | Find cameras | Yes, plugged in with a USB OTG cable | Yes, cameras the browser can see |
 | Live preview | Yes | Yes |
-| Take a JPEG photo | Yes, saved as a file | Yes, kept in memory |
+| Take a JPEG photo | Yes, as a file in your folder (or the cache folder) | Yes, kept in memory |
+| Photo as bytes, no file | Yes | Yes |
 | Choose the resolution | Yes, from the sizes the camera reports | Yes, the browser picks the closest |
 | Snapshot button on the camera | Yes | No, browsers do not give pages access |
 | Plug and unplug events | Yes | Yes |
@@ -250,12 +254,57 @@ final XFile photo = await camera.capture(quality: 90); // quality 1 to 100
 final bytes = await photo.readAsBytes();
 ```
 
-- **Android:** the photo is a JPEG file in your app's cache folder
-  (`photo.path`). Move it somewhere permanent, or delete it when you no longer
-  need it.
+- **Android:** by default the photo is a JPEG file in your app's cache folder
+  (`photo.path`). To keep it, save it straight to your own folder (below)
+  instead of moving it afterwards.
 - **Web:** the photo is kept in memory; use `readAsBytes()`.
 - Calling `capture` again while a photo is being taken returns the same photo,
   so a double tap produces one image, not two.
+
+### Save photos to your own folder
+
+Pass `directory` and `fileName` and the JPEG is written there directly, with
+no copy or move:
+
+```dart
+import 'package:path_provider/path_provider.dart';
+
+final docs = await getApplicationDocumentsDirectory();
+final photo = await camera.capture(
+  directory: '${docs.path}/photos', // created if it doesn't exist
+  fileName: 'scan_001.jpg',         // replaces a file with the same name
+);
+print(photo.path); // .../photos/scan_001.jpg
+```
+
+- `directory` must be an absolute path your app can write to, such as
+  `getApplicationDocumentsDirectory()`, `getApplicationSupportDirectory()` or
+  `getExternalStorageDirectory()`. Without it the photo goes to the cache
+  folder.
+- `fileName` must be a plain name: no `/` or `\`. Without it the photo is named
+  `uvc_<milliseconds>.jpg`.
+- **Web:** `directory` is ignored; `fileName` becomes the in-memory file's
+  name.
+- A bad `fileName` or an empty `directory` throws `ArgumentError` before
+  anything is captured. If the folder can't be created or written, `capture`
+  throws `ProtocolError` and no partial file is left behind.
+
+### Get photo bytes without a file
+
+To upload a photo, show it, or hand it to your own storage (a database, the
+gallery, cloud storage), skip the file entirely:
+
+```dart
+final Uint8List jpeg = await camera.captureBytes(quality: 90);
+Image.memory(jpeg);                    // show it
+await http.post(uploadUrl, body: jpeg); // or upload it
+```
+
+Nothing is written to disk, so there is nothing to clean up. A double tap on
+`captureBytes` also produces one image. To put photos in the phone's gallery,
+pass the bytes to a gallery package such as
+[gal](https://pub.dev/packages/gal); Android doesn't let apps write to the
+gallery through a plain folder path.
 
 ### Use the camera's snapshot button
 
@@ -386,7 +435,9 @@ and your debug log.
 
 ## Example app
 
-The [`example`](example) folder is a complete USB camera viewer. See its
+The [`example`](example) folder is a complete USB camera viewer. Its
+**Save to** menu shows all three ways to keep a photo: the cache folder, the
+app's own folder, or memory only (bytes). See its
 [README](example/README.md) for what each button does.
 
 ```bash
@@ -424,8 +475,16 @@ Yes, on Android: `camera.buttonPresses.listen((_) => camera.capture())`.
 Each press arrives once.
 
 **Where are photos saved?**
-On Android, as JPEG files in the app's cache folder (`photo.path`). On the
-web, in memory (`photo.readAsBytes()`).
+Where you choose. `camera.capture(directory: ..., fileName: ...)` writes the
+JPEG straight to your folder; without them it goes to the app's cache folder
+(`photo.path`). `camera.captureBytes()` returns the JPEG bytes and writes
+nothing. On the web photos are kept in memory. See
+[Save photos to your own folder](#save-photos-to-your-own-folder).
+
+**Can I get the photo as bytes instead of a file?**
+Yes: `final Uint8List jpeg = await camera.captureBytes();`. Use it to upload,
+display with `Image.memory`, or save with your own code. See
+[Get photo bytes without a file](#get-photo-bytes-without-a-file).
 
 **Does it work on iPhone or iPad?**
 Not yet. iPads (iPadOS 17 and later) support USB cameras, and iPad support is
@@ -443,11 +502,11 @@ No. The package has no network access and no telemetry.
 
 ## Compared with other packages
 
-A fair summary to help you choose (versions as of September 2026):
+A fair summary to help you choose (versions as of October 2026):
 
 | Package | Android | Web | Snapshot button | Latest release |
 | --- | --- | --- | --- | --- |
-| **skio_uvc_camera** | Yes | Yes | Yes (Android) | 0.1.0, 2026 |
+| **skio_uvc_camera** | Yes | Yes | Yes (Android) | 0.2.0, October 2026 |
 | [uvccamera](https://pub.dev/packages/uvccamera) | Yes | No | See its docs | 0.0.13, March 2025 |
 | [flutter_uvc_camera](https://pub.dev/packages/flutter_uvc_camera) | Yes | No | See its docs | 1.0.0, May 2025 |
 

@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:skio_uvc_camera/skio_uvc_camera.dart';
 
 import 'delete_file.dart';
@@ -54,6 +55,7 @@ class _ViewerPageState extends State<ViewerPage> {
   UvcCamera? _camera;
   UvcSize? _size;
   bool _busy = false;
+  SaveTo _saveTo = SaveTo.cache;
   final _shots = <Shot>[];
   StreamSubscription<DeviceEvent>? _events;
   StreamSubscription<void>? _button;
@@ -139,18 +141,40 @@ class _ViewerPageState extends State<ViewerPage> {
     final camera = _camera;
     if (camera == null) return;
     try {
-      final file = await camera.capture(quality: 90);
-      final bytes = await file.readAsBytes();
-      if (mounted) setState(() => _shots.insert(0, Shot(file.path, bytes)));
+      final shot = switch (_saveTo) {
+        // Default: a file in the app's cache folder.
+        SaveTo.cache => await _shotFrom(camera.capture(quality: 90)),
+        // Straight into the app's own folder, no move or copy needed.
+        SaveTo.appFolder => await _shotFrom(
+          camera.capture(
+            quality: 90,
+            directory:
+                '${(await getApplicationDocumentsDirectory()).path}'
+                '/photos',
+            fileName: 'photo_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          ),
+        ),
+        // Bytes only, for uploading or your own storage code.
+        SaveTo.memory => Shot(null, await camera.captureBytes(quality: 90)),
+      };
+      if (mounted) setState(() => _shots.insert(0, shot));
     } on HardwareException catch (e) {
       _toast(e.message);
     }
   }
 
+  static Future<Shot> _shotFrom(Future<XFile> capture) async {
+    final file = await capture;
+    // Web captures have no path; they live in memory.
+    return Shot(kIsWeb ? null : file.path, await file.readAsBytes());
+  }
+
   Future<void> _delete(Shot shot) async {
     setState(() => _shots.remove(shot));
+    final path = shot.path;
+    if (path == null) return;
     try {
-      await deleteCapturedFile(shot.path);
+      await deleteCapturedFile(path);
     } on Exception catch (e) {
       _toast('Could not delete the file: $e');
     }
@@ -171,7 +195,7 @@ class _ViewerPageState extends State<ViewerPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      shot.path.split('/').last,
+                      shot.path ?? 'In memory, not saved',
                       style: Theme.of(context).textTheme.bodySmall,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -276,6 +300,31 @@ class _ViewerPageState extends State<ViewerPage> {
       appBar: AppBar(
         title: const Text('USB camera viewer'),
         actions: [
+          PopupMenuButton<SaveTo>(
+            tooltip: 'Where photos go',
+            onSelected: (v) => setState(() => _saveTo = v),
+            itemBuilder: (_) => [
+              for (final v in SaveTo.values)
+                // Browsers have no app folder to write to.
+                if (!kIsWeb || v != SaveTo.appFolder)
+                  CheckedPopupMenuItem(
+                    value: v,
+                    checked: v == _saveTo,
+                    child: Text(v.label),
+                  ),
+            ],
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.save_alt),
+                  SizedBox(width: 6),
+                  Text('Save to'),
+                ],
+              ),
+            ),
+          ),
           if (camera != null)
             PopupMenuButton<UvcSize>(
               tooltip: 'Preview size',
@@ -323,7 +372,8 @@ class _ViewerPageState extends State<ViewerPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
-                  '${camera.previewSize} · press the camera button or tap capture',
+                  '${camera.previewSize} · ${_saveTo.label.toLowerCase()} · '
+                  'press the camera button or tap capture',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
@@ -357,11 +407,23 @@ class _ViewerPageState extends State<ViewerPage> {
   }
 }
 
-/// A captured photo: where it was saved and its bytes for display.
+/// Where captured photos go.
+enum SaveTo {
+  cache('Cache folder'),
+  appFolder('App folder'),
+  memory('Memory only');
+
+  const SaveTo(this.label);
+
+  final String label;
+}
+
+/// A captured photo: where it was saved (null if only in memory) and its
+/// bytes for display.
 class Shot {
   Shot(this.path, this.bytes);
 
-  final String path;
+  final String? path;
   final Uint8List bytes;
 }
 

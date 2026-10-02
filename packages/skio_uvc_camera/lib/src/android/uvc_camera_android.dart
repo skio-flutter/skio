@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io' show Platform;
+import 'dart:typed_data';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/widgets.dart';
@@ -506,43 +507,91 @@ final class _AndroidUvcSession implements UvcCameraSession {
   Stream<UvcCameraStatus> get status => _status.stream;
 
   @override
-  Future<XFile> capture({required int quality}) {
-    if (_closed) {
-      throw Disconnected('Camera is closed', device: _device);
+  Future<XFile> capture({
+    required int quality,
+    String? directory,
+    String? fileName,
+  }) {
+    final dir = directory?.toJString();
+    final name = fileName?.toJString();
+    try {
+      return _grab(
+        (callback) => a.JpegCapture.capture(
+          _camera,
+          previewSize.width,
+          previewSize.height,
+          quality,
+          dir,
+          name,
+          callback,
+        ),
+        onFile: (path) => XFile(path, mimeType: 'image/jpeg'),
+      );
+    } finally {
+      dir?.release();
+      name?.release();
     }
-    final result = Completer<XFile>();
-    final callback = a.JpegCapture$Callback.implement(
-      a.$JpegCapture$Callback(
-        onCaptured: (path) {
-          final p = path?.toDartString(releaseOriginal: true);
-          if (result.isCompleted) return;
-          if (p == null) {
-            result.completeError(
-              ProtocolError('Capture returned no file', device: _device),
-            );
-          } else {
-            result.complete(XFile(p, mimeType: 'image/jpeg'));
-          }
-        },
-        onCaptured$async: true,
-        onError: (message) {
-          final text = message?.toDartString(releaseOriginal: true);
-          if (!result.isCompleted) {
-            result.completeError(
-              ProtocolError('Capture failed', device: _device, cause: text),
-            );
-          }
-        },
-        onError$async: true,
-      ),
-    );
-    a.JpegCapture.capture(
+  }
+
+  @override
+  Future<Uint8List> captureBytes({required int quality}) => _grab(
+    (callback) => a.JpegCapture.captureBytes(
       _camera,
       previewSize.width,
       previewSize.height,
       quality,
       callback,
+    ),
+    onBytes: (jpeg) => jpeg,
+  );
+
+  /// Starts a Java capture with [start] and completes with [onFile] or
+  /// [onBytes], whichever result Java reports.
+  Future<T> _grab<T>(
+    void Function(a.JpegCapture$Callback callback) start, {
+    T Function(String path)? onFile,
+    T Function(Uint8List jpeg)? onBytes,
+  }) {
+    if (_closed) {
+      throw Disconnected('Camera is closed', device: _device);
+    }
+    final result = Completer<T>();
+    void fail(String message, [String? cause]) {
+      if (result.isCompleted) return;
+      result.completeError(
+        ProtocolError(message, device: _device, cause: cause),
+      );
+    }
+
+    final callback = a.JpegCapture$Callback.implement(
+      a.$JpegCapture$Callback(
+        onCaptured: (path) {
+          final p = path?.toDartString(releaseOriginal: true);
+          if (p == null || onFile == null) {
+            return fail('Capture returned no file');
+          }
+          if (!result.isCompleted) result.complete(onFile(p));
+        },
+        onCaptured$async: true,
+        onCapturedBytes: (jpeg) {
+          if (jpeg == null || onBytes == null) {
+            jpeg?.release();
+            return fail('Capture returned no bytes');
+          }
+          // getRange copies out of the Java array, so it can be released.
+          final bytes = Uint8List.sublistView(jpeg.getRange(0, jpeg.length));
+          jpeg.release();
+          if (!result.isCompleted) result.complete(onBytes(bytes));
+        },
+        onCapturedBytes$async: true,
+        onError: (message) => fail(
+          'Capture failed',
+          message?.toDartString(releaseOriginal: true),
+        ),
+        onError$async: true,
+      ),
     );
+    start(callback);
     const timeout = Duration(seconds: 5);
     return result.future
         .timeout(

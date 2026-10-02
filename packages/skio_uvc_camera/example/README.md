@@ -26,11 +26,12 @@ flutter run -d chrome  # browser
 | **Camera** | The USB camera to use. |
 | **Refresh** | Looks for newly plugged-in cameras. |
 | **Open** / **Close** | Starts or stops the camera. |
+| **Save to** (top bar) | Where photos go: **Cache folder** (`capture()`), **App folder** (`capture(directory: ..., fileName: ...)`, written straight to the app's documents folder) or **Memory only** (`captureBytes()`, no file). App folder is not shown on the web. |
 | **Size** (top bar, when open) | Lists every resolution the camera supports; pick one to reopen at that size. The current one is ticked. |
-| Text under the picture | The size in use, for example `1280x720 25fps mjpeg`. |
+| Text under the picture | The size in use and where photos go, for example `1280x720 25fps mjpeg · cache folder`. |
 | **Capture** | Takes a JPEG photo. The camera's snapshot button does the same (Android only). |
 | Photo at the bottom | Tap it to see it full size, with **Close** and **Delete**. |
-| **✕** on a photo | Deletes that photo straight away (also its file on Android). |
+| **✕** on a photo | Deletes that photo straight away (also its file on Android, if it was saved to one). |
 
 Messages at the bottom of the screen tell you when a camera is plugged in or
 out. In debug builds the package's log is printed to the console

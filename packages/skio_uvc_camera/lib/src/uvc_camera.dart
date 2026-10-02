@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:skio_core/skio_core.dart';
@@ -20,6 +21,9 @@ const _source = 'skio_uvc_camera';
 /// );
 /// // In build(): UvcPreview(camera: cam)
 /// final jpeg = await cam.capture(quality: 95);
+/// // Or straight into your own folder, or as bytes with no file at all:
+/// await cam.capture(directory: photosDir, fileName: 'scan_001.jpg');
+/// final Uint8List bytes = await cam.captureBytes();
 /// await cam.close();
 /// ```
 final class UvcCamera {
@@ -101,7 +105,7 @@ final class UvcCamera {
   final _buttons = StreamController<void>.broadcast();
   final _statuses = StreamController<UvcCameraStatus>.broadcast();
   UvcCameraStatus _status = UvcCameraStatus.previewing;
-  Future<XFile>? _pendingCapture;
+  _Capture? _pendingCapture;
 
   /// Every size and format the camera supports.
   List<UvcSize> get supportedSizes => _session.supportedSizes;
@@ -126,33 +130,114 @@ final class UvcCamera {
   /// The platform session, for [UvcPreview].
   UvcCameraSession get session => _session;
 
-  /// Captures the current frame as a JPEG.
+  /// Captures the current frame as a JPEG file.
   ///
-  /// [quality] is 1 to 100. On Android the result is a file in the app's
-  /// cache directory; move or delete it when done. On the web it is an
-  /// in-memory file. Calls made while a capture is running get the same
-  /// result, so a double-tap produces one image.
-  Future<XFile> capture({int quality = 90}) {
+  /// [quality] is 1 to 100.
+  ///
+  /// On Android the photo is written to [directory] as [fileName], so it
+  /// lands where your app keeps photos without a move or copy. [directory]
+  /// must be an absolute path the app can write to (for example from
+  /// `path_provider`'s `getApplicationDocumentsDirectory()`); it is created
+  /// if missing. [fileName] must be a plain name such as `scan_001.jpg` (no
+  /// `/`), and an existing file with that name is replaced. Without
+  /// [directory] the photo goes to the app's cache folder; without
+  /// [fileName] it is named `uvc_<milliseconds>.jpg`.
+  ///
+  /// On the web the result is an in-memory file named [fileName];
+  /// [directory] is ignored.
+  ///
+  /// To upload, display or hand the photo to another API without writing a
+  /// file, use [captureBytes].
+  ///
+  /// Calls made while the same capture is running get the same result, so a
+  /// double-tap produces one image. Captures to a different file, and
+  /// [captureBytes], wait for the running one and then take their own frame.
+  Future<XFile> capture({
+    int quality = 90,
+    String? directory,
+    String? fileName,
+  }) {
+    _checkQuality(quality);
+    if (directory != null && directory.isEmpty) {
+      throw ArgumentError.value(directory, 'directory', 'must not be empty');
+    }
+    if (fileName != null) _checkFileName(fileName);
+    return _guard(('file', directory, fileName), () async {
+      final file = await _session.capture(
+        quality: quality,
+        directory: directory,
+        fileName: fileName,
+      );
+      SkioLog.log(
+        LogLevel.info,
+        _source,
+        () => 'Captured ${file.path}',
+        device: device,
+      );
+      return file;
+    });
+  }
+
+  /// Captures the current frame as JPEG bytes, without writing a file.
+  ///
+  /// Use it to upload the photo, show it with `Image.memory`, or save it
+  /// with your own storage code (for example to the gallery). [quality] is
+  /// 1 to 100. Shares the in-flight guard with [capture]: calls made while a
+  /// bytes capture is running get the same bytes.
+  Future<Uint8List> captureBytes({int quality = 90}) {
+    _checkQuality(quality);
+    return _guard(('bytes',), () async {
+      final bytes = await _session.captureBytes(quality: quality);
+      SkioLog.log(
+        LogLevel.info,
+        _source,
+        () => 'Captured ${bytes.length} bytes',
+        device: device,
+      );
+      return bytes;
+    });
+  }
+
+  void _checkQuality(int quality) {
     if (quality < 1 || quality > 100) {
       throw ArgumentError.value(quality, 'quality', 'must be 1 to 100');
     }
     if (!isOpen) {
       throw Disconnected('Camera is closed', device: device);
     }
-    return _pendingCapture ??= _capture(quality).whenComplete(() {
-      _pendingCapture = null;
-    });
   }
 
-  Future<XFile> _capture(int quality) async {
-    final file = await _session.capture(quality: quality);
-    SkioLog.log(
-      LogLevel.info,
-      _source,
-      () => 'Captured ${file.path}',
-      device: device,
-    );
-    return file;
+  static void _checkFileName(String name) {
+    if (name.isEmpty ||
+        name == '.' ||
+        name == '..' ||
+        name.contains('/') ||
+        name.contains(r'\') ||
+        name.contains('\u0000')) {
+      throw ArgumentError.value(
+        name,
+        'fileName',
+        'must be a plain file name without path separators',
+      );
+    }
+  }
+
+  /// Runs [run] unless a capture for the same [key] is already running, in
+  /// which case its result is shared. A capture for another key waits for
+  /// the running one: the camera delivers frames to one capture at a time.
+  Future<T> _guard<T extends Object>(Object key, Future<T> Function() run) {
+    final pending = _pendingCapture;
+    if (pending != null && pending.key == key) {
+      return pending.result as Future<T>;
+    }
+    final Future<T> result = pending == null
+        ? run()
+        : pending.result.then((_) => run(), onError: (Object _) => run());
+    final capture = _Capture(key, result);
+    _pendingCapture = capture;
+    return result.whenComplete(() {
+      if (identical(_pendingCapture, capture)) _pendingCapture = null;
+    });
   }
 
   /// Stops the preview and releases the camera. Safe to call more than once.
@@ -193,4 +278,12 @@ final class UvcCamera {
 
   @override
   String toString() => 'UvcCamera($device, $previewSize, ${_status.name})';
+}
+
+/// A running capture and what it was asked for.
+final class _Capture {
+  _Capture(this.key, this.result);
+
+  final Object key;
+  final Future<Object> result;
 }

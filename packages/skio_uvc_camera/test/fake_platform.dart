@@ -73,15 +73,32 @@ final class FakeSession implements UvcCameraSession {
   @override
   Stream<UvcCameraStatus> get status => statuses.stream;
 
+  /// Arguments of each capture call, in order.
+  final calls = <String>[];
+
   @override
-  Future<XFile> capture({required int quality}) async {
+  Future<XFile> capture({
+    required int quality,
+    String? directory,
+    String? fileName,
+  }) async {
     captures++;
+    calls.add('file $quality $directory $fileName');
     if (captureGate case final gate?) await gate.future;
+    final name = fileName ?? 'capture$captures.jpg';
     return XFile.fromData(
       Uint8List.fromList([0xff, 0xd8, quality]),
-      name: 'capture$captures.jpg',
-      path: 'capture$captures.jpg',
+      name: name,
+      path: directory == null ? name : '$directory/$name',
     );
+  }
+
+  @override
+  Future<Uint8List> captureBytes({required int quality}) async {
+    captures++;
+    calls.add('bytes $quality');
+    if (captureGate case final gate?) await gate.future;
+    return Uint8List.fromList([0xff, 0xd8, quality]);
   }
 
   @override
