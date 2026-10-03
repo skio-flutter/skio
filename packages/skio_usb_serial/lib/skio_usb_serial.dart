@@ -9,6 +9,4 @@ import 'src/usb_serial_port.dart';
 
 export 'package:skio_core/skio_core.dart';
 
-export 'src/line_reader.dart';
-export 'src/serial_config.dart';
 export 'src/usb_serial_port.dart';

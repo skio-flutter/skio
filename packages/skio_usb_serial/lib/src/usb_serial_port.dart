@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:skio_core/skio_core.dart';
 
 import 'platform/usb_serial_platform.dart';
-import 'serial_config.dart';
 
 const _source = 'skio_usb_serial';
 

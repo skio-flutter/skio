@@ -1,8 +1,9 @@
 name: skio_core
 description: >-
   Shared types for the skio Flutter hardware plugins: permissions, a sealed
-  hardware exception family, USB device filters, and opt-in logging.
-version: 0.1.3
+  hardware exception family, USB device filters, serial port settings, a
+  line reader, and opt-in logging.
+version: 0.2.0
 homepage: https://skio-flutter.dev
 repository: https://github.com/skio-flutter/skio/tree/main/packages/skio_core
 issue_tracker: https://github.com/skio-flutter/skio/issues

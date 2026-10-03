@@ -1,3 +1,10 @@
+## 0.2.0
+
+- **Serial settings moved here.** `SerialConfig`, `Parity`, `StopBits`,
+  `FlowControl` and `LineReader` now live in skio_core, so `skio_usb_serial`
+  and `skio_uart` share them. Apps importing them through
+  `skio_usb_serial` need no changes.
+
 ## 0.1.3
 
 - README: `DeviceHandle.id` examples for macOS (`/dev/cu.usbserial-110`),

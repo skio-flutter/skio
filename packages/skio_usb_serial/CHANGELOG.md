@@ -10,6 +10,9 @@
   `DeviceBusy`.
 - Sandboxed macOS apps need the `com.apple.security.device.serial`
   entitlement; without it `open` throws `AccessDenied` saying so.
+- `SerialConfig`, `Parity`, `StopBits`, `FlowControl` and `LineReader` now
+  live in skio_core 0.2.0, shared with the new `skio_uart` package. Imports
+  through `skio_usb_serial` keep working unchanged.
 - Example: runs on macOS, with macOS-specific hints.
 - Verified on a Mac with an ESP32 through its CH340 chip.
 

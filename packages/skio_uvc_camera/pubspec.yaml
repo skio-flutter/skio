@@ -27,7 +27,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   jni: ^1.0.3
-  skio_core: ^0.1.0
+  skio_core: ^0.2.0
   web: ^1.1.1
 
 dev_dependencies:

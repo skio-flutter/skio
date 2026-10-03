@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:skio_core/skio_core.dart';
 
-import '../serial_config.dart';
 import 'default_platform.dart'
     if (dart.library.js_interop) '../web/usb_serial_web.dart'
     if (dart.library.ffi) 'native_platform.dart';
