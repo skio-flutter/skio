@@ -11,6 +11,7 @@
 - Sandboxed macOS apps need the `com.apple.security.device.serial`
   entitlement; without it `open` throws `AccessDenied` saying so.
 - Example: runs on macOS, with macOS-specific hints.
+- Verified on a Mac with an ESP32 through its CH340 chip.
 
 ## 0.1.3
 

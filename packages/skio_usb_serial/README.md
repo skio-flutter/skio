@@ -391,7 +391,7 @@ the package.
 | STM32 microcontroller boards | USB serial | Open, receive and send work |
 | Nordic (nRF) boards | USB serial | Open, receive and send work |
 
-**Phones and browsers**
+**Phones, computers and browsers**
 
 | Device | Platform | Result |
 | --- | --- | --- |
@@ -399,6 +399,7 @@ the package.
 | OPPO | Android, USB OTG | Works |
 | Samsung | Android, USB OTG | Works |
 | POCO M7 5G | Android 16, USB OTG | Works |
+| Mac (with an ESP32 through its CH340 chip) | macOS app | Works |
 | Chrome on macOS | Web Serial | Works |
 
 Tried another adapter or phone? Please
@@ -408,8 +409,6 @@ and your debug log.
 ## Limitations
 
 - Android, macOS and web only for now; Windows and Linux are planned.
-- macOS support is new: it is covered by automated tests against a
-  pseudo-terminal, and real adapter reports are very welcome.
 - On Android and macOS, plug and unplug events are checked once a second.
 - macOS has no mark or space parity and no 1.5 stop bits; these throw
   `Unsupported`.
