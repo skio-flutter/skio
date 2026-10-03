@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
@@ -7,16 +6,10 @@ import 'package:jni/jni.dart';
 import 'package:jni_flutter/jni_flutter.dart';
 import 'package:skio_core/skio_core.dart';
 
-import '../platform/default_platform.dart' as fallback;
+import '../platform/device_poller.dart';
 import '../platform/usb_serial_platform.dart';
 import '../serial_config.dart';
 import 'bindings.g.dart' as a;
-
-/// Picks the Android implementation on Android, and the unsupported fallback
-/// on other native platforms.
-UsbSerialPlatform createDefaultPlatform() => Platform.isAndroid
-    ? AndroidUsbSerialPlatform()
-    : fallback.createDefaultPlatform();
 
 /// [UsbSerialPlatform] for Android USB host (OTG), calling `UsbManager` and
 /// usb-serial-for-android directly through JNI.
@@ -177,35 +170,7 @@ final class AndroidUsbSerialPlatform extends UsbSerialPlatform {
       );
 
   @override
-  Stream<DeviceEvent> get events {
-    Timer? timer;
-    var known = <String, DeviceHandle>{};
-    late final StreamController<DeviceEvent> controller;
-    Future<void> poll() async {
-      final now = {for (final d in await list()) d.id: d};
-      for (final d in now.values) {
-        if (!known.containsKey(d.id)) controller.add(DeviceAttached(d));
-      }
-      for (final d in known.values) {
-        if (!now.containsKey(d.id)) controller.add(DeviceDetached(d));
-      }
-      known = now;
-    }
-
-    controller = StreamController<DeviceEvent>.broadcast(
-      onListen: () async {
-        known = {for (final d in await list()) d.id: d};
-        // The listener may have cancelled while the first list() ran.
-        if (!controller.hasListener) return;
-        timer = Timer.periodic(pollInterval, (_) => unawaited(poll()));
-      },
-      onCancel: () {
-        timer?.cancel();
-        timer = null;
-      },
-    );
-    return controller.stream;
-  }
+  Stream<DeviceEvent> get events => pollDeviceEvents(list, pollInterval);
 
   /// Calls [visit] for each port of each attached serial device until it
   /// returns true. Objects passed to [visit] are released afterwards unless

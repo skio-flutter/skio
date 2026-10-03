@@ -9,7 +9,8 @@ Talk to **USB serial devices** from a Flutter app: Arduino and ESP32 boards,
 USB-to-serial adapters (CH340, CP210x, FTDI, PL2303), GPS modules, scales,
 barcode readers, lab instruments and anything else that shows up as a serial
 port. **Send and receive bytes or text** on **Android** (with a USB OTG
-cable) and in the **browser** (Chrome and Edge, using Web Serial).
+cable), in **macOS apps**, and in the **browser** (Chrome and Edge, using Web
+Serial).
 
 Part of the [skio](https://github.com/skio-flutter/skio) family of Flutter
 hardware plugins.
@@ -43,27 +44,31 @@ hardware plugins.
 
 ## Platforms
 
-| Feature | Android | Web (Chrome, Edge) |
-| --- | --- | --- |
-| How it connects | USB host (OTG) cable or adapter | Web Serial API |
-| Finding ports | Lists every attached adapter | The user picks a port in a browser popup; picked ports are remembered |
-| Permission | A USB dialog for each device | Picking the port in the popup is the permission |
-| Send and receive | Yes | Yes |
-| Baud rate, data bits, parity, stop bits | Yes | Yes (7 or 8 data bits; parity none, odd or even; 1 or 2 stop bits) |
-| Hardware flow control (RTS/CTS) | Yes, if the chip supports it | Yes |
-| DTR/DSR and XON/XOFF flow control | Yes, if the chip supports it | No |
-| DTR and RTS lines | Yes | Yes |
-| Plug and unplug events | Yes (checked once a second) | Yes |
-| Minimum version | Android 7.0 (API 24) | Desktop Chrome or Edge, page served over https or localhost |
+| Feature | Android | macOS | Web (Chrome, Edge) |
+| --- | --- | --- | --- |
+| How it connects | USB host (OTG) cable or adapter | The `/dev/cu.*` port macOS creates for the adapter | Web Serial API |
+| Finding ports | Lists every attached adapter | Lists every attached USB serial port, with vendor, product and serial number | The user picks a port in a browser popup; picked ports are remembered |
+| Permission | A USB dialog for each device | None at runtime; sandboxed apps need one entitlement | Picking the port in the popup is the permission |
+| Send and receive | Yes | Yes | Yes |
+| Baud rate, data bits, parity, stop bits | Yes | Yes, any baud rate (parity none, odd or even; 1 or 2 stop bits) | Yes (7 or 8 data bits; parity none, odd or even; 1 or 2 stop bits) |
+| Hardware flow control (RTS/CTS) | Yes, if the chip supports it | Yes | Yes |
+| DTR/DSR and XON/XOFF flow control | Yes, if the chip supports it | Yes | No |
+| DTR and RTS lines | Yes | Yes | Yes |
+| Plug and unplug events | Yes (checked once a second) | Yes (checked once a second) | Yes |
+| Minimum version | Android 7.0 (API 24) | Same as Flutter | Desktop Chrome or Edge, page served over https or localhost |
 
-Safari, Firefox, iOS, macOS apps, Windows apps and Linux apps are not
-supported yet. On those platforms the package reports
-`AccessStatus.unsupported` instead of failing.
+Safari, Firefox, iOS, Windows apps and Linux apps are not supported yet. On
+those platforms the package reports `AccessStatus.unsupported` instead of
+failing.
 
 **Supported chips on Android:** CH340/CH341/CH9102, CP210x, FTDI (FT232,
 FT2232, ...), Prolific PL2303, and CDC-ACM devices such as Arduino boards and
 ESP32/RP2040 native USB. Adapters with several ports (for example FT2232)
 show one entry per port.
+
+**On macOS** any adapter that shows up as `/dev/cu.*` works. Recent macOS
+versions include drivers for CDC-ACM devices and the common FTDI, CH340,
+CP210x and PL2303 chips.
 
 ## Install
 
@@ -76,6 +81,19 @@ declares USB host as optional (so your app still installs on phones without
 it), and includes the rules that keep release builds working with code
 shrinking. The Android library it uses (usb-serial-for-android) comes from
 JitPack; the package adds that repository for you.
+
+**macOS:** apps are sandboxed by default, and a sandboxed app can only open
+serial ports with the serial device entitlement. Add it to both
+`macos/Runner/DebugProfile.entitlements` and
+`macos/Runner/Release.entitlements`:
+
+```xml
+<key>com.apple.security.device.serial</key>
+<true/>
+```
+
+Without it, `open` throws `AccessDenied`. The package uses `dart:ffi` only,
+so there is no CocoaPods or Swift setup.
 
 **Web:** serve the page over **https** (or `http://localhost` while
 developing), and open it in desktop Chrome or Edge.
@@ -128,6 +146,9 @@ for (final port in ports) {
 ```
 
 On **Android** this lists every USB serial adapter plugged into the phone.
+On **macOS** it lists every USB serial port (built-in ports such as
+`Bluetooth-Incoming-Port` are left out); `device.id` is the `/dev/cu.*`
+path and `device.serialNumber` is filled in when the adapter has one.
 On the **web** it lists the ports the user has already picked for this site.
 
 To look for one kind of device, pass its USB vendor (and product) ID:
@@ -156,12 +177,12 @@ ElevatedButton(
 ```
 
 - `UsbSerialPort.requiresUserSelection` is `true` on the web and `false` on
-  Android, so the same code can decide whether to show the button.
+  Android and macOS, so the same code can decide whether to show the button.
 - Pass `filters` to `request()` to show only matching adapters in the popup.
 - The browser remembers picked ports for your site, so next time `list()`
   returns them without the popup.
 - `request()` must be called from a user action such as a button press; on
-  Android it throws `Unsupported` (use `list()` there).
+  Android and macOS it throws `Unsupported` (use `list()` there).
 
 ### Ask for permission (Android)
 
@@ -175,7 +196,8 @@ if (!access.isUsable) {
 Android asks the user once per device ("Allow the app to access USB
 Serial?"). `checkAccess(device)` tells you whether permission is already
 granted, without showing a dialog. On the web, picking the port is the
-permission, so `requestAccess()` opens the port popup.
+permission, so `requestAccess()` opens the port popup. On macOS no runtime
+permission exists, so both return `AccessStatus.notRequired`.
 
 ### Open a port with the right settings
 
@@ -250,7 +272,7 @@ await port.write(data, timeout: const Duration(seconds: 5));
 
 - Writes are sent **in the order you call them**, even without `await`.
 - Writing never freezes your app's UI; on Android the data goes to a
-  background thread.
+  background thread, and on macOS writes never block.
 - If the device doesn't accept the data in time, `write` throws
   `OperationTimeout`.
 
@@ -316,8 +338,8 @@ try {
 
 | Error | What it means | What to do |
 | --- | --- | --- |
-| `AccessDenied` | No permission for the device (Android), or the port popup wasn't opened from a user action (web). | Call `requestAccess(device)`; on the web call `request()` from a button press. |
-| `DeviceBusy` | Another app, browser tab or serial monitor is using the port. | Close the other program (Arduino IDE, serial monitor, other tab), then open again. |
+| `AccessDenied` | No permission for the device (Android), the app lacks the serial entitlement (macOS), or the port popup wasn't opened from a user action (web). | Call `requestAccess(device)`; on macOS add the [entitlement](#install); on the web call `request()` from a button press. |
+| `DeviceBusy` | Another app, browser tab or serial monitor is using the port, or this app already has it open. | Close the other program (Arduino IDE, serial monitor, other tab), then open again. |
 | `DeviceNotFound` | The device was unplugged. | Plug it in and list the ports again. |
 | `Disconnected` | The device went away while in use. | Check the cable, then open again. |
 | `OperationTimeout` | The device didn't accept data in time. | Check the baud rate and flow control settings. |
@@ -354,6 +376,8 @@ the package.
 | Lines arrive cut in half | USB delivers chunks, not messages. Use `LineReader` or your own framing. |
 | No ports on Android | The phone needs USB host (OTG) support, and some phones need OTG turned on in settings. Use a powered hub for boards that draw more current. |
 | `DeviceBusy` on the web | The port is open in another tab or program. Close it there. |
+| `AccessDenied` on macOS | The app is sandboxed without `com.apple.security.device.serial`. Add it to both entitlements files and rebuild. |
+| No ports on macOS | Check the adapter appears with `ls /dev/cu.*`. If it doesn't, the chip needs a driver from its maker. |
 | The web popup doesn't open | `request()` wasn't called from a button press, the page isn't https/localhost, or the browser isn't Chrome/Edge. |
 | Nothing received | Check the device is actually sending, the baud rate, and that TX/RX wires aren't swapped. |
 
@@ -367,7 +391,7 @@ the package.
 | STM32 microcontroller boards | USB serial | Open, receive and send work |
 | Nordic (nRF) boards | USB serial | Open, receive and send work |
 
-**Phones and browsers**
+**Phones, computers and browsers**
 
 | Device | Platform | Result |
 | --- | --- | --- |
@@ -375,6 +399,7 @@ the package.
 | OPPO | Android, USB OTG | Works |
 | Samsung | Android, USB OTG | Works |
 | POCO M7 5G | Android 16, USB OTG | Works |
+| Mac (with an ESP32 through its CH340 chip) | macOS app | Works |
 | Chrome on macOS | Web Serial | Works |
 
 Tried another adapter or phone? Please
@@ -383,8 +408,10 @@ and your debug log.
 
 ## Limitations
 
-- Android and web only for now.
-- On Android, plug and unplug events are checked once a second.
+- Android, macOS and web only for now; Windows and Linux are planned.
+- On Android and macOS, plug and unplug events are checked once a second.
+- macOS has no mark or space parity and no 1.5 stop bits; these throw
+  `Unsupported`.
 - Web Serial doesn't support 5 or 6 data bits, mark/space parity, 1.5 stop
   bits, or DTR/DSR and XON/XOFF flow control; these throw `Unsupported`.
 
@@ -398,6 +425,7 @@ each button does.
 ```bash
 cd example
 flutter run            # on an Android phone with a USB serial device attached
+flutter run -d macos   # as a Mac app
 flutter run -d chrome  # in the browser
 ```
 
@@ -429,10 +457,14 @@ as on Android.
 No. Apple doesn't let iPhone or iPad apps talk to USB serial adapters (only
 to Apple-certified accessories).
 
-**Does it work on Windows, macOS or Linux?**
-Not yet; desktop support is planned. Today,
+**Does it work on macOS?**
+Yes, from 0.2.0, with the same code as on Android. Sandboxed apps need the
+`com.apple.security.device.serial` entitlement (see [Install](#install)).
+
+**Does it work on Windows or Linux?**
+Not yet; support is planned. Today,
 [`flutter_libserialport`](https://pub.dev/packages/flutter_libserialport)
-covers desktop serial ports.
+covers those platforms.
 
 **How do I read text line by line?**
 `port.input.transform(const LineReader())` gives a stream of lines, even when
@@ -454,16 +486,16 @@ No. The package has no network access and no telemetry.
 
 A fair summary to help you choose (versions as of September 2026):
 
-| Package | Android | Web | Windows, macOS, Linux | Latest release |
-| --- | --- | --- | --- | --- |
-| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Planned | 2026 |
-| [usb_serial](https://pub.dev/packages/usb_serial) | Yes | No | No | 0.5.2, July 2024 |
-| [flutter_libserialport](https://pub.dev/packages/flutter_libserialport) | Yes | No | Yes | 0.6.0, August 2025 |
-| [serial_port_win32](https://pub.dev/packages/serial_port_win32) | No | No | Windows only | 3.0.0, August 2026 |
+| Package | Android | Web | macOS | Windows, Linux | Latest release |
+| --- | --- | --- | --- | --- | --- |
+| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Yes | Planned | 2026 |
+| [usb_serial](https://pub.dev/packages/usb_serial) | Yes | No | No | No | 0.5.2, July 2024 |
+| [flutter_libserialport](https://pub.dev/packages/flutter_libserialport) | Yes | No | Yes | Yes | 0.6.0, August 2025 |
+| [serial_port_win32](https://pub.dev/packages/serial_port_win32) | No | No | No | Windows only | 3.0.0, August 2026 |
 
-Choose **skio_usb_serial** for Android and the web with one API, typed errors,
-line reading and in-app logging. For desktop today, `flutter_libserialport` is
-a good choice.
+Choose **skio_usb_serial** for Android, macOS and the web with one API, typed
+errors, line reading and in-app logging. For Windows and Linux today,
+`flutter_libserialport` is a good choice.
 
 ## Migrating from usb_serial
 
@@ -512,7 +544,10 @@ Android setup.
 On Android the package calls the phone's USB system and the
 [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android)
 library (MIT) directly from Dart through JNI, with no platform channels and
-no Java code of its own. On the web it uses the browser's Web Serial API.
+no Java code of its own. On macOS it finds ports through IOKit and talks to
+them with POSIX termios, both through `dart:ffi`, reading on a background
+isolate so the UI never waits; there is no native code to compile. On the
+web it uses the browser's Web Serial API.
 All queueing, line reading and error handling is Dart code, covered by unit
 tests.
 
