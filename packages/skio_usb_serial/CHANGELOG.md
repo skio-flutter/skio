@@ -1,3 +1,12 @@
+## 0.2.1
+
+- `SerialConfig`, `Parity`, `StopBits`, `FlowControl` and `LineReader` now
+  come from skio_core 0.2.0, shared with the new
+  [`skio_uart`](https://pub.dev/packages/skio_uart) package. No API changes:
+  imports through `skio_usb_serial` work as before, and apps can now use
+  both packages together.
+- README points Windows, Linux and Android panel UART users to `skio_uart`.
+
 ## 0.2.0
 
 - **macOS support.** Lists USB serial ports through IOKit (with vendor,
@@ -10,9 +19,6 @@
   `DeviceBusy`.
 - Sandboxed macOS apps need the `com.apple.security.device.serial`
   entitlement; without it `open` throws `AccessDenied` saying so.
-- `SerialConfig`, `Parity`, `StopBits`, `FlowControl` and `LineReader` now
-  live in skio_core 0.2.0, shared with the new `skio_uart` package. Imports
-  through `skio_usb_serial` keep working unchanged.
 - Example: runs on macOS, with macOS-specific hints.
 - Verified on a Mac with an ESP32 through its CH340 chip.
 
