@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>skio: Flutter plugins for USB serial and USB cameras</title>
-<meta name="description" content="Open-source Flutter plugins for USB hardware on Android and the web: skio_usb_serial for ESP32, STM32, Arduino and USB-serial adapters, and skio_uvc_camera for USB cameras, endoscopes and microscopes.">
+<title>skio: Flutter plugins for USB serial, UART and USB cameras</title>
+<meta name="description" content="Open-source Flutter plugins for hardware: skio_usb_serial for ESP32, STM32, Arduino and USB-serial adapters on Android, macOS and the web, skio_uart for UART, RS-232 and RS-485 ports on Android panels, Linux, Windows and macOS, and skio_uvc_camera for USB cameras, endoscopes and microscopes.">
 <link rel="canonical" href="https://skio-flutter.dev/">
-<meta name="keywords" content="Flutter USB serial, Flutter serial port, Flutter ESP32, Flutter STM32, Flutter Arduino, Flutter USB camera, Flutter UVC, Flutter endoscope, Web Serial Flutter, USB OTG Flutter">
+<meta name="keywords" content="Flutter USB serial, Flutter serial port, Flutter ESP32, Flutter STM32, Flutter Arduino, Flutter USB camera, Flutter UVC, Flutter endoscope, Web Serial Flutter, USB OTG Flutter, Flutter UART, Flutter RS-485, Flutter RS-232, Flutter COM port, Flutter Raspberry Pi serial, Flutter Jetson UART, Flutter macOS serial port">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="skio">
 <meta property="og:title" content="skio: Flutter plugins for real hardware">
-<meta property="og:description" content="USB serial and USB cameras in Flutter, on Android and the web. Direct native bindings, no platform channels.">
+<meta property="og:description" content="USB serial, UART and USB cameras in Flutter, on Android, macOS, Windows, Linux and the web. Direct native bindings, no platform channels.">
 <meta property="og:url" content="https://skio-flutter.dev/">
 <meta property="og:image" content="https://skio-flutter.dev/og.png">
 <meta property="og:image:width" content="1200">
@@ -18,10 +18,10 @@
 <meta property="og:image:alt" content="skio: Flutter plugins for real hardware. skio_usb_serial, skio_uvc_camera, skio_core.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="skio: Flutter plugins for real hardware">
-<meta name="twitter:description" content="USB serial and USB cameras in Flutter, on Android and the web.">
+<meta name="twitter:description" content="USB serial, UART and USB cameras in Flutter, on Android, macOS, Windows, Linux and the web.">
 <meta name="twitter:image" content="https://skio-flutter.dev/og.png">
 <link rel="alternate" type="text/plain" title="LLM-friendly summary" href="https://skio-flutter.dev/llms.txt">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://skio-flutter.dev/#site", "name": "skio", "url": "https://skio-flutter.dev/", "description": "Open-source Flutter plugins for USB hardware on Android and the web: skio_usb_serial for ESP32, STM32, Arduino and USB-serial adapters, and skio_uvc_camera for USB cameras, endoscopes and microscopes."}, {"@type": "Organization", "@id": "https://skio-flutter.dev/#publisher", "name": "skio", "url": "https://skio-flutter.dev/", "logo": "https://skio-flutter.dev/og.png", "sameAs": ["https://github.com/skio-flutter", "https://pub.dev/publishers/skio-flutter.dev/packages"]}, {"@type": "SoftwareSourceCode", "name": "skio_usb_serial", "description": "Flutter plugin for USB serial ports on Android (USB OTG) and the web (Web Serial): ESP32, STM32, Nordic, Arduino, CH340, CP210x, FTDI, PL2303, CDC-ACM.", "url": "https://pub.dev/packages/skio_usb_serial", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, Web", "license": "https://opensource.org/licenses/BSD-3-Clause"}, {"@type": "SoftwareSourceCode", "name": "skio_uvc_camera", "description": "Flutter plugin for USB (UVC) cameras on Android and the web: live preview, JPEG capture, the camera's snapshot button and resolution choice.", "url": "https://pub.dev/packages/skio_uvc_camera", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_uvc_camera", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, Web", "license": "https://opensource.org/licenses/BSD-3-Clause"}, {"@type": "SoftwareSourceCode", "name": "skio_core", "description": "Shared Dart types for the skio plugins: permissions, error types, device filters and opt-in logging.", "url": "https://pub.dev/packages/skio_core", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_core", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, iOS, Web, Windows, macOS, Linux", "license": "https://opensource.org/licenses/BSD-3-Clause"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://skio-flutter.dev/#site", "name": "skio", "url": "https://skio-flutter.dev/", "description": "Open-source Flutter plugins for hardware: skio_usb_serial for ESP32, STM32, Arduino and USB-serial adapters on Android, macOS and the web, skio_uart for UART, RS-232 and RS-485 ports on Android panels, Linux, Windows and macOS, and skio_uvc_camera for USB cameras, endoscopes and microscopes."}, {"@type": "Organization", "@id": "https://skio-flutter.dev/#publisher", "name": "skio", "url": "https://skio-flutter.dev/", "logo": "https://skio-flutter.dev/og.png", "sameAs": ["https://github.com/skio-flutter", "https://pub.dev/publishers/skio-flutter.dev/packages"]}, {"@type": "SoftwareSourceCode", "name": "skio_usb_serial", "description": "Flutter plugin for USB serial ports on Android (USB OTG), macOS and the web (Web Serial): ESP32, STM32, Nordic, Arduino, CH340, CP210x, FTDI, PL2303, CDC-ACM.", "url": "https://pub.dev/packages/skio_usb_serial", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, macOS, Web", "license": "https://opensource.org/licenses/BSD-3-Clause"}, {"@type": "SoftwareSourceCode", "name": "skio_uart", "description": "Serial ports by path for Flutter and Dart: UART, RS-232 and RS-485 on Android panels (/dev/ttyS*), Linux, Jetson, Raspberry Pi, Windows (COM3) and macOS. Pure Dart FFI, nothing native to build.", "url": "https://pub.dev/packages/skio_uart", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_uart", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, Linux, Windows, macOS", "license": "https://opensource.org/licenses/BSD-3-Clause"}, {"@type": "SoftwareSourceCode", "name": "skio_uvc_camera", "description": "Flutter plugin for USB (UVC) cameras on Android and the web: live preview, JPEG capture, the camera's snapshot button and resolution choice.", "url": "https://pub.dev/packages/skio_uvc_camera", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_uvc_camera", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, Web", "license": "https://opensource.org/licenses/BSD-3-Clause"}, {"@type": "SoftwareSourceCode", "name": "skio_core", "description": "Shared Dart types for the skio plugins: permissions, error types, device filters, serial settings and opt-in logging.", "url": "https://pub.dev/packages/skio_core", "codeRepository": "https://github.com/skio-flutter/skio/tree/main/packages/skio_core", "programmingLanguage": "Dart", "runtimePlatform": "Flutter", "operatingSystem": "Android, iOS, Web, Windows, macOS, Linux", "license": "https://opensource.org/licenses/BSD-3-Clause"}]}</script>
 <meta name="color-scheme" content="light dark">
 <script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 <meta name="theme-color" content="#0b0f0e" media="(prefers-color-scheme: dark)">
@@ -205,7 +205,7 @@
   .sub { color: var(--muted); max-width: 620px; margin: 0 0 36px; font-size: 16.5px; }
 
   /* Packages */
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .card {
     position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 22px; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; overflow: hidden;
@@ -284,7 +284,7 @@
 
   /* Support table */
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 560px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 820px; }
   th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--border); vertical-align: top; }
   tr:last-child td { border-bottom: 0; }
   th { font: 600 11.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--bg-2); }
@@ -293,6 +293,8 @@
   .pill.wip { background: color-mix(in srgb, var(--accent-2) 14%, transparent); color: var(--accent-2); }
   .pill.none { background: var(--bg-2); color: var(--muted); }
   td small { display: block; color: var(--muted); font-size: 13px; margin-top: 6px; }
+  td:first-child small { font: 400 13px/1.4 var(--sans); }
+  td small code { font-size: 12px; }
   .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; align-items: center; }
   .chip-row > span { color: var(--muted); font-size: 14px; margin-right: 4px; }
   .chip-row .chips li { font-size: 12.5px; padding: 7px 10px; background: var(--surface); }
@@ -390,10 +392,9 @@
     tr { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); }
     tr:last-child { border-bottom: 0; }
     td { border: 0; padding: 12px 16px; }
-    td:first-child, td:last-child { grid-column: 1 / -1; }
-    td:first-child { padding-top: 18px; padding-bottom: 4px; }
-    td:last-child { padding-top: 4px; padding-bottom: 18px; color: var(--muted); font-size: 14px; }
-    td[data-label="Android"]::before, td[data-label="Web"]::before {
+    td:first-child { grid-column: 1 / -1; padding-top: 18px; padding-bottom: 4px; }
+    tr > td:last-child { padding-bottom: 18px; }
+    td[data-label]:not(:first-child)::before {
       content: attr(data-label); display: block; font: 600 11px/1 var(--mono); letter-spacing: .08em;
       text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
     }
@@ -449,11 +450,11 @@
     <section class="hero">
       <div class="hero-grid">
         <div>
-          <div class="eyebrow"><span class="led live"></span> Open source · BSD-3-Clause<span class="wide"> · v0.1 on pub.dev</span></div>
+          <div class="eyebrow"><span class="led live"></span> Open source · BSD-3-Clause<span class="wide"> · 4 packages on pub.dev</span></div>
           <h1>Flutter plugins for <em>real hardware.</em></h1>
-          <p class="lead">skio connects Flutter apps to USB serial devices and USB cameras,
-            on Android and in the browser, with macOS, Windows, Linux and iPad coming soon.
-            It binds native APIs directly with jnigen and
+          <p class="lead">skio connects Flutter apps to USB serial devices, UART ports and USB cameras,
+            on Android, macOS, Windows, Linux and in the browser.
+            It calls native APIs directly with jnigen, <code>dart:ffi</code> and
             <code>dart:js_interop</code>, so there are no platform channels, and the logic lives in
             testable Dart.</p>
           <div class="btns">
@@ -463,11 +464,10 @@
           </div>
           <div class="install"><code><span class="p">$ </span>flutter pub add skio_usb_serial</code><button class="copy" data-copy-from="install">copy</button></div>
           <ul class="stats" aria-label="At a glance">
-            <li><b>3</b>packages</li>
-            <li><b>160/160</b>pub points</li>
-            <li><b>2</b>platforms today: Android and web</li>
-            <li><b>+4</b>coming soon</li>
+            <li><b>4</b>packages</li>
+            <li><b>5</b>platforms: Android, macOS, Windows, Linux, web</li>
             <li><b>0</b>platform channels</li>
+            <li><b>0</b>telemetry</li>
           </ul>
         </div>
         <div>
@@ -488,10 +488,10 @@
   <div class="ticker" aria-label="Supported hardware">
     <div class="ticker-track">
       <ul>
-        <li>ESP32</li><li>STM32</li><li>Nordic nRF</li><li>Arduino</li><li>CP210x</li><li>CH340</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li><li>macOS · Windows · Linux · iPad (coming soon)</li>
+        <li>ESP32</li><li>STM32</li><li>Nordic nRF</li><li>Arduino</li><li>CP210x</li><li>CH340</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>Android USB OTG</li><li>macOS</li><li>Web Serial</li><li>UART</li><li>RS-232</li><li>RS-485</li><li>Android panels</li><li>Jetson</li><li>Raspberry Pi</li><li>Windows COM ports</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li>
       </ul>
       <ul aria-hidden="true">
-        <li>ESP32</li><li>STM32</li><li>Nordic nRF</li><li>Arduino</li><li>CP210x</li><li>CH340</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>Android USB OTG</li><li>Web Serial</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li><li>macOS · Windows · Linux · iPad (coming soon)</li>
+        <li>ESP32</li><li>STM32</li><li>Nordic nRF</li><li>Arduino</li><li>CP210x</li><li>CH340</li><li>FTDI</li><li>PL2303</li><li>CDC-ACM</li><li>Android USB OTG</li><li>macOS</li><li>Web Serial</li><li>UART</li><li>RS-232</li><li>RS-485</li><li>Android panels</li><li>Jetson</li><li>Raspberry Pi</li><li>Windows COM ports</li><li>UVC cameras</li><li>Endoscopes</li><li>Microscopes</li><li>USB webcams</li>
       </ul>
     </div>
   </div>
@@ -500,26 +500,33 @@
     <section class="block" id="packages">
       <p class="kicker reveal">Packages</p>
       <h2 class="reveal">One family, one way of doing things.</h2>
-      <p class="sub reveal">Each plugin covers one transport. They share permissions, errors and device matching through <code>skio_core</code>.</p>
+      <p class="sub reveal">Each package covers one transport. They share permissions, errors, serial settings and device matching through <code>skio_core</code>.</p>
       <div class="cards">
         <article class="card reveal">
-          <div class="card-top"><div class="status"><span class="led live"></span>Stable · v0.1</div><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v14M8 7l4-4 4 4M7 11v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/><circle cx="12" cy="19.5" r="1.5"/></svg></div></div>
+          <div class="card-top"><div class="status"><span class="led live"></span>Stable · v0.2</div><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v14M8 7l4-4 4 4M7 11v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/><circle cx="12" cy="19.5" r="1.5"/></svg></div></div>
           <h3>skio_usb_serial</h3>
-          <p>Send and receive data with USB serial devices: Arduino and ESP32 boards, USB-to-serial adapters, instruments. Android over USB OTG, and Chrome or Edge with Web Serial.</p>
-          <ul class="chips"><li>ESP32</li><li>STM32</li><li>Nordic nRF</li><li>Arduino</li><li>CP210x</li><li>CH340</li><li>FTDI</li></ul>
+          <p>Send and receive data with USB serial devices: Arduino and ESP32 boards, USB-to-serial adapters, instruments. Android over USB OTG, macOS apps, and Chrome or Edge with Web Serial. Windows and Linux are in progress.</p>
+          <ul class="chips"><li>Android</li><li>macOS</li><li>Web</li><li>ESP32</li><li>STM32</li><li>Arduino</li><li>CH340</li><li>FTDI</li></ul>
           <div class="card-links"><a href="https://pub.dev/packages/skio_usb_serial">pub.dev →</a><a href="https://github.com/skio-flutter/skio/tree/main/packages/skio_usb_serial">Docs →</a></div>
         </article>
         <article class="card reveal">
-          <div class="card-top"><div class="status"><span class="led live"></span>Stable · v0.1</div><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="m16 11 5-3v8l-5-3"/></svg></div></div>
+          <div class="card-top"><div class="status"><span class="led live"></span>Beta · v0.1 · new</div><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></div></div>
+          <h3>skio_uart</h3>
+          <p>Open serial ports by path: the UART, RS-232 and RS-485 ports built into Android panels, Jetson and Raspberry Pi boards, Windows COM ports and USB adapters on Linux and macOS. Pure Dart FFI, nothing native to build, and it also runs in Dart command-line tools.</p>
+          <ul class="chips"><li>Android panels</li><li>Linux</li><li>Windows</li><li>macOS</li><li>RS-485</li><li>Jetson</li><li>Raspberry Pi</li></ul>
+          <div class="card-links"><a href="https://pub.dev/packages/skio_uart">pub.dev →</a><a href="https://github.com/skio-flutter/skio/tree/main/packages/skio_uart">Docs →</a></div>
+        </article>
+        <article class="card reveal">
+          <div class="card-top"><div class="status"><span class="led live"></span>Stable · v0.2</div><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="m16 11 5-3v8l-5-3"/></svg></div></div>
           <h3>skio_uvc_camera</h3>
-          <p>USB cameras (endoscopes, microscopes, webcams) on Android and the web: live preview, JPEG photos, the camera's snapshot button, and your choice of resolution.</p>
+          <p>USB cameras (endoscopes, microscopes, webcams) on Android and the web: live preview, JPEG photos, the camera's snapshot button, and your choice of resolution. macOS, Windows and Linux are in progress.</p>
           <ul class="chips"><li>Android</li><li>Web</li><li>UVC</li><li>MJPEG</li></ul>
           <div class="card-links"><a href="https://pub.dev/packages/skio_uvc_camera">pub.dev →</a><a href="https://github.com/skio-flutter/skio/tree/main/packages/skio_uvc_camera">Docs →</a></div>
         </article>
         <article class="card reveal">
-          <div class="card-top"><div class="status"><span class="led live"></span>Stable · v0.1</div><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12 4 7.5M12 12l8-4.5M12 12v9"/></svg></div></div>
+          <div class="card-top"><div class="status"><span class="led live"></span>Stable · v0.2</div><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12 4 7.5M12 12l8-4.5M12 12v9"/></svg></div></div>
           <h3>skio_core</h3>
-          <p>The shared building blocks: one permission API, one error family, device filters and opt-in logging for every skio plugin.</p>
+          <p>The shared building blocks: one permission API, one error family, device filters, serial settings and opt-in logging for every skio package.</p>
           <ul class="chips"><li>Pure Dart</li><li>No Flutter dependency</li></ul>
           <div class="card-links"><a href="https://pub.dev/packages/skio_core">pub.dev →</a><a href="https://github.com/skio-flutter/skio/tree/main/packages/skio_core">Docs →</a></div>
         </article>
@@ -529,7 +536,7 @@
     <section class="block" id="how">
       <p class="kicker reveal">How it works</p>
       <h2 class="reveal">From your widget to the wire, in Dart.</h2>
-      <p class="sub reveal">skio calls the platform USB APIs through generated bindings. Buffering, framing and timeouts run in Dart, where you can test them. The diagram shows serial; <code>skio_uvc_camera</code> takes the same path to UVCAndroid on Android and <code>getUserMedia</code> in the browser.</p>
+      <p class="sub reveal">skio calls the platform APIs through generated bindings and <code>dart:ffi</code>. Buffering, framing and timeouts run in Dart, where you can test them. The diagram shows USB serial; <code>skio_uart</code> goes through <code>dart:ffi</code> to libc on Android, Linux and macOS and to kernel32 on Windows, and <code>skio_uvc_camera</code> takes the same path to UVCAndroid on Android and <code>getUserMedia</code> in the browser.</p>
       <div class="flow reveal">
         <div class="node">
           <div class="lbl">Your app</div>
@@ -548,6 +555,11 @@
             <div class="lbl">Android</div>
             <b><code>jnigen</code> → UsbManager</b>
             <span>Direct JNI calls, USB OTG.</span>
+          </div>
+          <div class="node">
+            <div class="lbl">macOS</div>
+            <b><code>dart:ffi</code> → IOKit + termios</b>
+            <span>No native code to compile.</span>
           </div>
           <div class="node">
             <div class="lbl">Web</div>
@@ -570,7 +582,7 @@
         <div>
           <p class="kicker reveal">What it looks like</p>
           <h2 class="reveal">A small API that stays out of your way.</h2>
-          <p class="sub reveal">Open a port and exchange bytes, or open a camera and take a photo. Errors come from one sealed type, so a <code>switch</code> can handle every case.</p>
+          <p class="sub reveal">Open a USB adapter or a UART and exchange bytes, or open a camera and take a photo. Errors come from one sealed type, so a <code>switch</code> can handle every case.</p>
           <ul class="features reveal">
             <li><div><code>DeviceFilter</code> <span>to match ports by vendor and product ID</span></div></li>
             <li><div><code>SerialConfig</code> <span>for baud rate, data bits, parity, stop bits and flow control</span></div></li>
@@ -583,6 +595,7 @@
         <div class="term reveal">
           <div class="tabs" role="tablist" aria-label="Code samples">
             <button role="tab" id="tab-io" aria-controls="panel-io" aria-selected="true">serial.dart</button>
+            <button role="tab" id="tab-uart" aria-controls="panel-uart" aria-selected="false" tabindex="-1">uart.dart</button>
             <button role="tab" id="tab-cam" aria-controls="panel-cam" aria-selected="false" tabindex="-1">camera.dart</button>
             <button role="tab" id="tab-err" aria-controls="panel-err" aria-selected="false" tabindex="-1">errors.dart</button>
             <button class="copy" data-copy-from="active">copy</button>
@@ -593,6 +606,13 @@
 
 port.input.<span class="f">listen</span>((bytes) =&gt; <span class="f">print</span>(bytes));
 <span class="k">await</span> port.<span class="f">write</span>(utf8.<span class="f">encode</span>(<span class="s">'hello\n'</span>));
+<span class="k">await</span> port.<span class="f">close</span>();</code></pre>
+<pre role="tabpanel" id="panel-uart" aria-labelledby="tab-uart" hidden><code><span class="c">// '/dev/ttyS3' on a panel, 'COM3' on Windows, '/dev/ttyTHS1' on a Jetson</span>
+<span class="k">final</span> port = <span class="k">await</span> <span class="y">SerialPort</span>.<span class="f">open</span>(<span class="s">'/dev/ttyS3'</span>,
+    config: <span class="k">const</span> <span class="y">SerialConfig</span>(baudRate: <span class="n">9600</span>));
+
+port.input.<span class="f">transform</span>(<span class="k">const</span> <span class="y">LineReader</span>()).<span class="f">listen</span>(<span class="f">print</span>);
+<span class="k">await</span> port.<span class="f">write</span>(utf8.<span class="f">encode</span>(<span class="s">'READ\r\n'</span>));
 <span class="k">await</span> port.<span class="f">close</span>();</code></pre>
 <pre role="tabpanel" id="panel-cam" aria-labelledby="tab-cam" hidden><code><span class="k">final</span> cameras = <span class="k">await</span> <span class="y">UvcCamera</span>.<span class="f">devices</span>();
 <span class="k">await</span> <span class="y">UvcCamera</span>.access.<span class="f">requestAccess</span>(cameras.first);
@@ -620,44 +640,58 @@ cam.buttonPresses.<span class="f">listen</span>((_) =&gt; cam.<span class="f">ca
     <section class="block" id="support">
       <p class="kicker reveal">Platform support</p>
       <h2 class="reveal">Where each package runs.</h2>
-      <p class="sub reveal">All three packages are on pub.dev and have been tested with real hardware on Android and the web. Desktop and iPad support is on the way.</p>
+      <p class="sub reveal">All four packages are on pub.dev. The stable ones have been tested with real hardware on Android, macOS and the web; <code>skio_uart</code> is new and in beta.</p>
       <div class="table-wrap reveal">
         <table>
-          <thead><tr><th scope="col">Package</th><th scope="col">Android</th><th scope="col">Web</th><th scope="col">Notes</th></tr></thead>
+          <thead><tr><th scope="col">Package</th><th scope="col">Android</th><th scope="col">macOS</th><th scope="col">Windows</th><th scope="col">Linux</th><th scope="col">Web</th></tr></thead>
           <tbody>
             <tr>
-              <td data-label="Package">skio_usb_serial</td>
+              <td data-label="Package">skio_usb_serial<small>USB serial adapters and boards</small></td>
               <td data-label="Android"><span class="pill">stable</span><small>USB OTG, Android 7.0+</small></td>
+              <td data-label="macOS"><span class="pill">stable</span><small>Any <code>/dev/cu.*</code> port</small></td>
+              <td data-label="Windows"><span class="pill wip">in progress</span><small>Use skio_uart today</small></td>
+              <td data-label="Linux"><span class="pill wip">in progress</span><small>Use skio_uart today</small></td>
               <td data-label="Web"><span class="pill">stable</span><small>Web Serial, Chrome and Edge</small></td>
-              <td data-label="Notes">Tested with ESP32, STM32 and Nordic boards on vivo, OPPO, Samsung and POCO phones, and in Chrome on macOS.</td>
             </tr>
             <tr>
-              <td data-label="Package">skio_uvc_camera</td>
+              <td data-label="Package">skio_uart<small>Serial ports by path</small></td>
+              <td data-label="Android"><span class="pill">beta</span><small>Built-in UARTs, <code>/dev/ttyS*</code></small></td>
+              <td data-label="macOS"><span class="pill">beta</span><small><code>/dev/cu.*</code></small></td>
+              <td data-label="Windows"><span class="pill">beta</span><small>Any COM port</small></td>
+              <td data-label="Linux"><span class="pill">beta</span><small>Jetson, Raspberry Pi, PCs</small></td>
+              <td data-label="Web"><span class="pill none">n/a</span><small>No serial ports in browsers</small></td>
+            </tr>
+            <tr>
+              <td data-label="Package">skio_uvc_camera<small>USB (UVC) cameras</small></td>
               <td data-label="Android"><span class="pill">stable</span><small>USB OTG, Android 7.0+</small></td>
+              <td data-label="macOS"><span class="pill wip">in progress</span></td>
+              <td data-label="Windows"><span class="pill wip">in progress</span></td>
+              <td data-label="Linux"><span class="pill wip">in progress</span></td>
               <td data-label="Web"><span class="pill">stable</span><small>getUserMedia; no snapshot button</small></td>
-              <td data-label="Notes">Preview, JPEG photos, snapshot button and resolution choice. Tested with a USB camera on a POCO phone (Android 16).</td>
             </tr>
             <tr>
-              <td data-label="Package">skio_core</td>
+              <td data-label="Package">skio_core<small>Shared types</small></td>
               <td data-label="Android"><span class="pill">pure Dart</span></td>
+              <td data-label="macOS"><span class="pill">pure Dart</span></td>
+              <td data-label="Windows"><span class="pill">pure Dart</span></td>
+              <td data-label="Linux"><span class="pill">pure Dart</span></td>
               <td data-label="Web"><span class="pill">pure Dart</span></td>
-              <td data-label="Notes">No platform code. Each plugin includes it.</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="soon reveal">
-        <h3>Coming soon</h3>
+        <h3>In progress</h3>
         <div class="soon-grid">
-          <div><span class="pill wip">coming soon</span><b>macOS</b><span>USB serial and USB cameras.</span></div>
-          <div><span class="pill wip">coming soon</span><b>Windows</b><span>USB serial and USB cameras.</span></div>
-          <div><span class="pill wip">coming soon</span><b>Linux</b><span>USB serial and USB cameras.</span></div>
+          <div><span class="pill wip">in progress</span><b>Windows</b><span>USB serial and USB cameras. Serial ports already work with <code>skio_uart</code>.</span></div>
+          <div><span class="pill wip">in progress</span><b>Linux</b><span>USB serial and USB cameras, starting with Ubuntu. Serial ports already work with <code>skio_uart</code>.</span></div>
+          <div><span class="pill wip">in progress</span><b>macOS</b><span>USB cameras. USB serial already works on macOS.</span></div>
           <div><span class="pill wip">coming soon</span><b>iPad</b><span>USB cameras on iPadOS 17 and later. Apple does not let iPhone or iPad apps use USB serial adapters.</span></div>
         </div>
       </div>
       <div class="chip-row reveal">
-        <span>Tested on phones:</span>
-        <ul class="chips"><li>vivo</li><li>OPPO</li><li>Samsung</li><li>POCO</li></ul>
+        <span>Tested on:</span>
+        <ul class="chips"><li>vivo</li><li>OPPO</li><li>Samsung</li><li>POCO</li><li>Mac</li><li>Chrome on macOS</li></ul>
       </div>
       <div class="chip-row reveal">
         <span>USB serial boards and chips:</span>
@@ -672,13 +706,14 @@ cam.buttonPresses.<span class="f">listen</span>((_) =&gt; cam.<span class="f">ca
       <ol class="steps">
         <li class="reveal">
           <h3>Add a package</h3>
-          <p>One command each. <code>skio_core</code> comes with them.</p>
+          <p>One command each. <code>skio_core</code> comes with them. <code>skio_uart</code> also works with <code>dart pub add</code>.</p>
           <div class="snip"><pre><code><span class="p">$ </span>flutter pub add skio_usb_serial
+<span class="p">$ </span>flutter pub add skio_uart
 <span class="p">$ </span>flutter pub add skio_uvc_camera</code></pre><button class="copy">copy</button></div>
         </li>
         <li class="reveal">
           <h3>Try the example apps</h3>
-          <p>A serial terminal and a USB camera viewer, for an Android phone or Chrome.</p>
+          <p>A USB serial terminal, a UART terminal and a USB camera viewer. Each package has one in <code>example/</code>.</p>
           <div class="snip"><pre><code><span class="p">$ </span>git clone https://github.com/skio-flutter/skio
 <span class="p">$ </span>cd skio/packages/skio_usb_serial/example
 <span class="p">$ </span>flutter run</code></pre><button class="copy">copy</button></div>
@@ -690,6 +725,17 @@ cam.buttonPresses.<span class="f">listen</span>((_) =&gt; cam.<span class="f">ca
   onPressed: () =&gt; <span class="y">UsbSerialPort</span>.<span class="f">request</span>(),
   child: <span class="k">const</span> <span class="y">Text</span>(<span class="s">'Choose port'</span>),
 )</code></pre><button class="copy">copy</button></div>
+        </li>
+        <li class="reveal">
+          <h3>On macOS, add the serial entitlement</h3>
+          <p>Sandboxed apps need it in both <code>DebugProfile.entitlements</code> and <code>Release.entitlements</code>.</p>
+          <div class="snip"><pre><code>&lt;<span class="k">key</span>&gt;com.apple.security.device.serial&lt;/<span class="k">key</span>&gt;
+&lt;<span class="k">true</span>/&gt;</code></pre><button class="copy">copy</button></div>
+        </li>
+        <li class="reveal">
+          <h3>On Linux, join <code>dialout</code></h3>
+          <p>Your user needs access to serial ports for <code>skio_uart</code>. Log out and in again afterwards.</p>
+          <div class="snip"><pre><code><span class="p">$ </span>sudo usermod -aG dialout $USER</code></pre><button class="copy">copy</button></div>
         </li>
         <li class="reveal">
           <h3>Test without hardware</h3>
@@ -706,9 +752,9 @@ cam.buttonPresses.<span class="f">listen</span>((_) =&gt; cam.<span class="f">ca
       <h2 class="reveal">How skio is built.</h2>
       <p class="sub reveal">A few rules every package follows.</p>
       <ul class="principles reveal">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h6M14 12h6M10 8v8M14 8v8"/></svg><b>Direct native bindings</b><span>jnigen, ffigen and js_interop. No MethodChannels, typed calls end to end.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h6M14 12h6M10 8v8M14 8v8"/></svg><b>Direct native bindings</b><span>jnigen, dart:ffi and js_interop. No MethodChannels, typed calls end to end.</span></li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><b>Logic in Dart</b><span>Queues, framing, timeouts and retries are Dart code you can unit-test without a device.</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 10h18"/></svg><b>Same API everywhere</b><span>One permission flow and one error type across every skio plugin.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 10h18"/></svg><b>Same API everywhere</b><span>One permission flow and one error type across every skio package.</span></li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><b>Transports, not drivers</b><span>Device protocols stay in your app, so any compatible device works.</span></li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/></svg><b>No telemetry</b><span>No network access, no tracking. Your data stays where your app puts it.</span></li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 8h14M7 8l-3 7h6zM17 8l-3 7h6z"/></svg><b>Free and open</b><span>BSD-3-Clause licence, free for personal and commercial use.</span></li>
