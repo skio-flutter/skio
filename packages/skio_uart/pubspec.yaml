@@ -1,0 +1,34 @@
+name: skio_uart
+description: >-
+  Serial ports by path for Flutter and Dart: UART, RS-232 and RS-485 on
+  Android panels (/dev/ttyS*), Linux, Jetson, Windows (COM3) and macOS. Pure
+  Dart FFI, nothing native to build.
+version: 0.1.0-beta.1
+homepage: https://skio-flutter.dev
+repository: https://github.com/skio-flutter/skio/tree/main/packages/skio_uart
+issue_tracker: https://github.com/skio-flutter/skio/issues
+topics:
+  - serial-port
+  - uart
+  - rs485
+  - embedded
+  - hardware
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+platforms:
+  android:
+  linux:
+  macos:
+  windows:
+
+dependencies:
+  ffi: ^2.1.0
+  skio_core: ^0.2.0
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.26.0

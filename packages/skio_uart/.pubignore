@@ -1,0 +1,6 @@
+# Keep in sync with /.gitignore; hidden files are never published.
+.dart_tool/
+build/
+coverage/
+*.jks
+*.keystore
