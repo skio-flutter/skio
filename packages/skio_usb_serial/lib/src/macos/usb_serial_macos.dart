@@ -8,7 +8,6 @@ import 'package:skio_core/skio_core.dart';
 
 import '../platform/device_poller.dart';
 import '../platform/usb_serial_platform.dart';
-import '../serial_config.dart';
 import 'iokit.dart';
 import 'posix.dart';
 

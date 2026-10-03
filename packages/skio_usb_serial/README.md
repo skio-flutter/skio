@@ -57,9 +57,10 @@ hardware plugins.
 | Plug and unplug events | Yes (checked once a second) | Yes (checked once a second) | Yes |
 | Minimum version | Android 7.0 (API 24) | Same as Flutter | Desktop Chrome or Edge, page served over https or localhost |
 
-Safari, Firefox, iOS, Windows apps and Linux apps are not supported yet. On
+Safari, Firefox, iOS, Windows apps and Linux apps are not supported; on
 those platforms the package reports `AccessStatus.unsupported` instead of
-failing.
+failing. For Windows, Linux and the UARTs built into Android panels, use
+[`skio_uart`](https://pub.dev/packages/skio_uart).
 
 **Supported chips on Android:** CH340/CH341/CH9102, CP210x, FTDI (FT232,
 FT2232, ...), Prolific PL2303, and CDC-ACM devices such as Arduino boards and
@@ -408,7 +409,8 @@ and your debug log.
 
 ## Limitations
 
-- Android, macOS and web only for now; Windows and Linux are planned.
+- Android, macOS and web only. For Windows, Linux and the UARTs built into
+  Android panels, use [`skio_uart`](https://pub.dev/packages/skio_uart).
 - On Android and macOS, plug and unplug events are checked once a second.
 - macOS has no mark or space parity and no 1.5 stop bits; these throw
   `Unsupported`.
@@ -462,9 +464,9 @@ Yes, from 0.2.0, with the same code as on Android. Sandboxed apps need the
 `com.apple.security.device.serial` entitlement (see [Install](#install)).
 
 **Does it work on Windows or Linux?**
-Not yet; support is planned. Today,
-[`flutter_libserialport`](https://pub.dev/packages/flutter_libserialport)
-covers those platforms.
+Use [`skio_uart`](https://pub.dev/packages/skio_uart), which opens any
+serial port by path on Windows, Linux, macOS and Android (including the
+UARTs built into Android panels), with the same `SerialConfig` and errors.
 
 **How do I read text line by line?**
 `port.input.transform(const LineReader())` gives a stream of lines, even when
@@ -488,14 +490,15 @@ A fair summary to help you choose (versions as of September 2026):
 
 | Package | Android | Web | macOS | Windows, Linux | Latest release |
 | --- | --- | --- | --- | --- | --- |
-| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Yes | Planned | 2026 |
+| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Yes | Use skio_uart | 2026 |
+| [skio_uart](https://pub.dev/packages/skio_uart) | Built-in UARTs | No | Yes | Yes | 2026 |
 | [usb_serial](https://pub.dev/packages/usb_serial) | Yes | No | No | No | 0.5.2, July 2024 |
 | [flutter_libserialport](https://pub.dev/packages/flutter_libserialport) | Yes | No | Yes | Yes | 0.6.0, August 2025 |
 | [serial_port_win32](https://pub.dev/packages/serial_port_win32) | No | No | No | Windows only | 3.0.0, August 2026 |
 
 Choose **skio_usb_serial** for Android, macOS and the web with one API, typed
-errors, line reading and in-app logging. For Windows and Linux today,
-`flutter_libserialport` is a good choice.
+errors, line reading and in-app logging. For Windows, Linux and Android
+panels' built-in ports, use `skio_uart`.
 
 ## Migrating from usb_serial
 
@@ -555,8 +558,9 @@ tests.
 
 | Package | What it does |
 | --- | --- |
-| [`skio_core`](https://pub.dev/packages/skio_core) | Shared types used by all skio packages: permissions, errors, device filters, logging |
+| [`skio_core`](https://pub.dev/packages/skio_core) | Shared types used by all skio packages: permissions, errors, device filters, serial settings, logging |
 | `skio_usb_serial` | USB serial ports (this package) |
+| [`skio_uart`](https://pub.dev/packages/skio_uart) | Serial ports by path: built-in UARTs, COM ports, adapters on Windows and Linux |
 | [`skio_uvc_camera`](https://pub.dev/packages/skio_uvc_camera) | USB cameras: preview, photos, snapshot button |
 
 ## License

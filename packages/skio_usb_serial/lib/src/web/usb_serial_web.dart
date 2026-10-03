@@ -8,7 +8,6 @@ import 'package:skio_core/skio_core.dart';
 import 'package:web/web.dart' as web;
 
 import '../platform/usb_serial_platform.dart';
-import '../serial_config.dart';
 import 'web_serial_bindings.dart';
 
 /// Web Serial implementation entry point, registered by Flutter on the web.

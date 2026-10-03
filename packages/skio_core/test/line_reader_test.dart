@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter_test/flutter_test.dart';
-import 'package:skio_usb_serial/skio_usb_serial.dart';
+import 'package:skio_core/skio_core.dart';
+import 'package:test/test.dart';
 
 Future<List<String>> read(
   List<List<int>> chunks, {

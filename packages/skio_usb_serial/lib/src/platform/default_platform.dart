@@ -1,6 +1,5 @@
 import 'package:skio_core/skio_core.dart';
 
-import '../serial_config.dart';
 import 'usb_serial_platform.dart';
 
 /// Fallback for platforms without an implementation.

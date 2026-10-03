@@ -8,11 +8,12 @@
 The shared building blocks of the [skio](https://github.com/skio-flutter/skio)
 Flutter hardware plugins. It gives every skio package **the same way to ask
 for permission, the same error types, the same way to pick devices, and the
-same logging**, so an app that uses a USB serial device and a USB camera
-handles both the same way.
+same logging**, so an app that uses a serial device and a USB camera handles
+both the same way.
 
 **You normally don't add this package yourself.**
-[`skio_usb_serial`](https://pub.dev/packages/skio_usb_serial) and
+[`skio_usb_serial`](https://pub.dev/packages/skio_usb_serial),
+[`skio_uart`](https://pub.dev/packages/skio_uart) and
 [`skio_uvc_camera`](https://pub.dev/packages/skio_uvc_camera) include it and
 re-export everything below. It is pure Dart, with no Flutter dependency and no
 platform code.
@@ -23,6 +24,7 @@ platform code.
 - [Errors: `HardwareException`](#errors-hardwareexception)
 - [Devices: `DeviceHandle` and `DeviceFilter`](#devices-devicehandle-and-devicefilter)
 - [Plug and unplug events: `DeviceEvent`](#plug-and-unplug-events-deviceevent)
+- [Serial settings: `SerialConfig` and `LineReader`](#serial-settings-serialconfig-and-linereader)
 - [Logging: `SkioLog`](#logging-skiolog)
 
 ## Permissions: `HardwareAccess`
@@ -142,6 +144,31 @@ switch (event) {
 }
 ```
 
+## Serial settings: `SerialConfig` and `LineReader`
+
+Both serial packages open ports with the same `SerialConfig` and read text
+with the same `LineReader`, so code moves between them unchanged:
+
+```dart
+const config = SerialConfig(
+  baudRate: 9600,          // required
+  dataBits: 8,             // 5 to 8 (default 8)
+  parity: Parity.none,     // none, odd, even, mark, space
+  stopBits: StopBits.one,  // one, onePointFive, two
+  flowControl: FlowControl.none, // none, rtsCts, dtrDsr, xonXoff
+  dtr: false,              // set DTR right after opening (null: leave as is)
+  rts: false,              // the same for RTS
+);
+print(config); // SerialConfig(9600 8N1, flow: none)
+
+port.input.transform(const LineReader()).listen(print);
+```
+
+`LineReader` turns a stream of byte chunks into text lines. It joins lines
+and UTF-8 characters split across chunks, accepts `\n`, `\r\n` and `\r`
+endings, and emits very long lines in pieces (65,536 characters by default) so a
+device that never sends a newline can't use up memory.
+
 ## Logging: `SkioLog`
 
 Logging is **off by default**. Turn it on to see what every skio package is
@@ -172,6 +199,7 @@ anywhere; what you do with them is up to your app.
 | --- | --- |
 | `skio_core` | Shared types (this package) |
 | [`skio_usb_serial`](https://pub.dev/packages/skio_usb_serial) | USB serial ports (Arduino, ESP32, USB-to-serial adapters) |
+| [`skio_uart`](https://pub.dev/packages/skio_uart) | Serial ports by path: Android panel UARTs, Jetson and Raspberry Pi, Windows COM ports |
 | [`skio_uvc_camera`](https://pub.dev/packages/skio_uvc_camera) | USB cameras: preview, photos, snapshot button |
 
 ## License

@@ -1,3 +1,8 @@
+## 0.2.1
+
+- Depends on skio_core 0.2.0, so it can be used in the same app as
+  [`skio_uart`](https://pub.dev/packages/skio_uart). No API changes.
+
 ## 0.2.0
 
 - `capture(directory: ..., fileName: ...)` writes the JPEG straight to your
