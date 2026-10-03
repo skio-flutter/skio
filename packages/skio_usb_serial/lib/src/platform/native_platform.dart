@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
 import '../android/usb_serial_android.dart';
+import '../linux/usb_serial_linux.dart';
 import '../macos/usb_serial_macos.dart';
 import 'default_platform.dart' as fallback;
 import 'usb_serial_platform.dart';
@@ -10,5 +11,6 @@ import 'usb_serial_platform.dart';
 UsbSerialPlatform createDefaultPlatform() {
   if (Platform.isAndroid) return AndroidUsbSerialPlatform();
   if (Platform.isMacOS) return MacosUsbSerialPlatform();
+  if (Platform.isLinux) return LinuxUsbSerialPlatform();
   return fallback.createDefaultPlatform();
 }

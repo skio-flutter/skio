@@ -9,7 +9,7 @@ Talk to **USB serial devices** from a Flutter app: Arduino and ESP32 boards,
 USB-to-serial adapters (CH340, CP210x, FTDI, PL2303), GPS modules, scales,
 barcode readers, lab instruments and anything else that shows up as a serial
 port. **Send and receive bytes or text** on **Android** (with a USB OTG
-cable), in **macOS apps**, and in the **browser** (Chrome and Edge, using Web
+cable), in **macOS and Linux apps**, and in the **browser** (Chrome and Edge, using Web
 Serial).
 
 Part of the [skio](https://github.com/skio-flutter/skio) family of Flutter
@@ -44,22 +44,23 @@ hardware plugins.
 
 ## Platforms
 
-| Feature | Android | macOS | Web (Chrome, Edge) |
-| --- | --- | --- | --- |
-| How it connects | USB host (OTG) cable or adapter | The `/dev/cu.*` port macOS creates for the adapter | Web Serial API |
-| Finding ports | Lists every attached adapter | Lists every attached USB serial port, with vendor, product and serial number | The user picks a port in a browser popup; picked ports are remembered |
-| Permission | A USB dialog for each device | None at runtime; sandboxed apps need one entitlement | Picking the port in the popup is the permission |
-| Send and receive | Yes | Yes | Yes |
-| Baud rate, data bits, parity, stop bits | Yes | Yes, any baud rate (parity none, odd or even; 1 or 2 stop bits) | Yes (7 or 8 data bits; parity none, odd or even; 1 or 2 stop bits) |
-| Hardware flow control (RTS/CTS) | Yes, if the chip supports it | Yes | Yes |
-| DTR/DSR and XON/XOFF flow control | Yes, if the chip supports it | Yes | No |
-| DTR and RTS lines | Yes | Yes | Yes |
-| Plug and unplug events | Yes (checked once a second) | Yes (checked once a second) | Yes |
-| Minimum version | Android 7.0 (API 24) | Same as Flutter | Desktop Chrome or Edge, page served over https or localhost |
+| Feature | Android | macOS | Linux | Web (Chrome, Edge) |
+| --- | --- | --- | --- | --- |
+| How it connects | USB host (OTG) cable or adapter | The `/dev/cu.*` port macOS creates for the adapter | The `/dev/ttyUSB*` or `/dev/ttyACM*` port Linux creates for the adapter | Web Serial API |
+| Finding ports | Lists every attached adapter | Lists every attached USB serial port, with vendor, product and serial number | Lists every attached USB serial port, with vendor, product and serial number | The user picks a port in a browser popup; picked ports are remembered |
+| Permission | A USB dialog for each device | None at runtime; sandboxed apps need one entitlement | The user must be in the `dialout` group (`uucp` on Arch) | Picking the port in the popup is the permission |
+| Send and receive | Yes | Yes | Yes | Yes |
+| Baud rate, data bits, parity, stop bits | Yes | Yes, any baud rate (parity none, odd or even; 1 or 2 stop bits) | Yes, any baud rate (every parity; 1 or 2 stop bits) | Yes (7 or 8 data bits; parity none, odd or even; 1 or 2 stop bits) |
+| Hardware flow control (RTS/CTS) | Yes, if the chip supports it | Yes | Yes | Yes |
+| DTR/DSR and XON/XOFF flow control | Yes, if the chip supports it | Yes | XON/XOFF only | No |
+| DTR and RTS lines | Yes | Yes | Yes | Yes |
+| Plug and unplug events | Yes (checked once a second) | Yes (checked once a second) | Yes (checked once a second) | Yes |
+| Minimum version | Android 7.0 (API 24) | Same as Flutter | Same as Flutter (x86_64 and arm64) | Desktop Chrome or Edge, page served over https or localhost |
 
-Safari, Firefox, iOS, Windows apps and Linux apps are not supported; on
-those platforms the package reports `AccessStatus.unsupported` instead of
-failing. For Windows, Linux and the UARTs built into Android panels, use
+Safari, Firefox, iOS and Windows apps are not supported; on those
+platforms the package reports `AccessStatus.unsupported` instead of
+failing. For Windows, and for serial ports that aren't USB (the UARTs built
+into Android panels, Raspberry Pi and Jetson pins), use
 [`skio_uart`](https://pub.dev/packages/skio_uart).
 
 **Supported chips on Android:** CH340/CH341/CH9102, CP210x, FTDI (FT232,
@@ -95,6 +96,18 @@ serial ports with the serial device entitlement. Add it to both
 
 Without it, `open` throws `AccessDenied`. The package uses `dart:ffi` only,
 so there is no CocoaPods or Swift setup.
+
+**Linux:** the user running the app needs read and write access to the
+port. On most distributions that means being in the `dialout` group (`uucp`
+on Arch):
+
+```bash
+sudo usermod -aG dialout $USER   # then log out and back in
+```
+
+Without it, `checkAccess(device)` reports `denied` and `open` throws
+`AccessDenied`, both with this hint. Nothing else to set up: the package
+uses `dart:ffi` only, with no C++ plugin code.
 
 **Web:** serve the page over **https** (or `http://localhost` while
 developing), and open it in desktop Chrome or Edge.
@@ -150,6 +163,9 @@ On **Android** this lists every USB serial adapter plugged into the phone.
 On **macOS** it lists every USB serial port (built-in ports such as
 `Bluetooth-Incoming-Port` are left out); `device.id` is the `/dev/cu.*`
 path and `device.serialNumber` is filled in when the adapter has one.
+On **Linux** it lists every USB serial port (`/dev/ttyUSB*`, `/dev/ttyACM*`
+and others backed by USB; built-in `ttyS*` UARTs are left out), with the
+same details read from sysfs.
 On the **web** it lists the ports the user has already picked for this site.
 
 To look for one kind of device, pass its USB vendor (and product) ID:
@@ -178,12 +194,12 @@ ElevatedButton(
 ```
 
 - `UsbSerialPort.requiresUserSelection` is `true` on the web and `false` on
-  Android and macOS, so the same code can decide whether to show the button.
+  Android, macOS and Linux, so the same code can decide whether to show the button.
 - Pass `filters` to `request()` to show only matching adapters in the popup.
 - The browser remembers picked ports for your site, so next time `list()`
   returns them without the popup.
 - `request()` must be called from a user action such as a button press; on
-  Android and macOS it throws `Unsupported` (use `list()` there).
+  Android, macOS and Linux it throws `Unsupported` (use `list()` there).
 
 ### Ask for permission (Android)
 
@@ -198,7 +214,9 @@ Android asks the user once per device ("Allow the app to access USB
 Serial?"). `checkAccess(device)` tells you whether permission is already
 granted, without showing a dialog. On the web, picking the port is the
 permission, so `requestAccess()` opens the port popup. On macOS no runtime
-permission exists, so both return `AccessStatus.notRequired`.
+permission exists, so both return `AccessStatus.notRequired`. On Linux both
+check whether the user can open the device node and return `granted`, or
+`denied` with a hint about the `dialout` group; Linux can't prompt for it.
 
 ### Open a port with the right settings
 
@@ -273,7 +291,7 @@ await port.write(data, timeout: const Duration(seconds: 5));
 
 - Writes are sent **in the order you call them**, even without `await`.
 - Writing never freezes your app's UI; on Android the data goes to a
-  background thread, and on macOS writes never block.
+  background thread, and on macOS and Linux writes never block.
 - If the device doesn't accept the data in time, `write` throws
   `OperationTimeout`.
 
@@ -339,7 +357,7 @@ try {
 
 | Error | What it means | What to do |
 | --- | --- | --- |
-| `AccessDenied` | No permission for the device (Android), the app lacks the serial entitlement (macOS), or the port popup wasn't opened from a user action (web). | Call `requestAccess(device)`; on macOS add the [entitlement](#install); on the web call `request()` from a button press. |
+| `AccessDenied` | No permission for the device (Android), the app lacks the serial entitlement (macOS), the user isn't in the `dialout` group (Linux), or the port popup wasn't opened from a user action (web). | Call `requestAccess(device)`; on macOS add the [entitlement](#install); on Linux add the user to `dialout`; on the web call `request()` from a button press. |
 | `DeviceBusy` | Another app, browser tab or serial monitor is using the port, or this app already has it open. | Close the other program (Arduino IDE, serial monitor, other tab), then open again. |
 | `DeviceNotFound` | The device was unplugged. | Plug it in and list the ports again. |
 | `Disconnected` | The device went away while in use. | Check the cable, then open again. |
@@ -379,6 +397,9 @@ the package.
 | `DeviceBusy` on the web | The port is open in another tab or program. Close it there. |
 | `AccessDenied` on macOS | The app is sandboxed without `com.apple.security.device.serial`. Add it to both entitlements files and rebuild. |
 | No ports on macOS | Check the adapter appears with `ls /dev/cu.*`. If it doesn't, the chip needs a driver from its maker. |
+| `AccessDenied` on Linux | The user isn't in the group that owns the port. Run `ls -l /dev/ttyUSB0` to see the group, add yourself with `sudo usermod -aG dialout $USER`, then log out and back in. |
+| `DeviceBusy` on Linux right after plugging in | ModemManager probes new `ttyACM` devices for a few seconds. Wait and retry, or stop it if you don't use a mobile modem. |
+| No ports in a Snap or Flatpak build | Sandboxed Linux packages need access to serial devices, for example the Snap `serial-port` interface or Flatpak's `--device=all`. |
 | The web popup doesn't open | `request()` wasn't called from a button press, the page isn't https/localhost, or the browser isn't Chrome/Edge. |
 | Nothing received | Check the device is actually sending, the baud rate, and that TX/RX wires aren't swapped. |
 
@@ -409,9 +430,15 @@ and your debug log.
 
 ## Limitations
 
-- Android, macOS and web only. For Windows, Linux and the UARTs built into
-  Android panels, use [`skio_uart`](https://pub.dev/packages/skio_uart).
-- On Android and macOS, plug and unplug events are checked once a second.
+- Android, macOS, Linux and web only. For Windows and for ports that
+  aren't USB (UARTs built into Android panels, Raspberry Pi and Jetson
+  pins), use [`skio_uart`](https://pub.dev/packages/skio_uart).
+- Linux support is new: it is covered by automated tests against a
+  pseudo-terminal on Linux, and real adapter reports are very welcome.
+- On Android, macOS and Linux, plug and unplug events are checked once a
+  second.
+- Linux has no 1.5 stop bits and no DTR/DSR flow control; these throw
+  `Unsupported`.
 - macOS has no mark or space parity and no 1.5 stop bits; these throw
   `Unsupported`.
 - Web Serial doesn't support 5 or 6 data bits, mark/space parity, 1.5 stop
@@ -428,6 +455,7 @@ each button does.
 cd example
 flutter run            # on an Android phone with a USB serial device attached
 flutter run -d macos   # as a Mac app
+flutter run -d linux   # as a Linux app
 flutter run -d chrome  # in the browser
 ```
 
@@ -463,10 +491,21 @@ to Apple-certified accessories).
 Yes, from 0.2.0, with the same code as on Android. Sandboxed apps need the
 `com.apple.security.device.serial` entitlement (see [Install](#install)).
 
-**Does it work on Windows or Linux?**
+**Does it work on Linux?**
+Yes, from 0.3.0, on x86_64 and arm64 (including Raspberry Pi with a 64-bit
+OS), with the same code as on Android. The user needs to be in the
+`dialout` group (see [Install](#install)).
+
+**Does it work on Windows?**
 Use [`skio_uart`](https://pub.dev/packages/skio_uart), which opens any
 serial port by path on Windows, Linux, macOS and Android (including the
 UARTs built into Android panels), with the same `SerialConfig` and errors.
+
+**Should I use skio_usb_serial or skio_uart on Linux?**
+Use `skio_usb_serial` for USB adapters and boards when you want one API
+across Android, macOS, Linux and the web, with port listing by USB vendor
+and product. Use `skio_uart` for ports that aren't USB (`/dev/ttyS*`,
+`/dev/ttyAMA*`, `/dev/ttyTHS*`), or when you also need Windows.
 
 **How do I read text line by line?**
 `port.input.transform(const LineReader())` gives a stream of lines, even when
@@ -488,17 +527,17 @@ No. The package has no network access and no telemetry.
 
 A fair summary to help you choose (versions as of September 2026):
 
-| Package | Android | Web | macOS | Windows, Linux | Latest release |
-| --- | --- | --- | --- | --- | --- |
-| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Yes | Use skio_uart | 2026 |
-| [skio_uart](https://pub.dev/packages/skio_uart) | Built-in UARTs | No | Yes | Yes | 2026 |
-| [usb_serial](https://pub.dev/packages/usb_serial) | Yes | No | No | No | 0.5.2, July 2024 |
-| [flutter_libserialport](https://pub.dev/packages/flutter_libserialport) | Yes | No | Yes | Yes | 0.6.0, August 2025 |
-| [serial_port_win32](https://pub.dev/packages/serial_port_win32) | No | No | No | Windows only | 3.0.0, August 2026 |
+| Package | Android | Web | macOS | Linux | Windows | Latest release |
+| --- | --- | --- | --- | --- | --- | --- |
+| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Yes | Yes | Use skio_uart | 2026 |
+| [skio_uart](https://pub.dev/packages/skio_uart) | Built-in UARTs | No | Yes | Yes | Yes | 2026 |
+| [usb_serial](https://pub.dev/packages/usb_serial) | Yes | No | No | No | No | 0.5.2, July 2024 |
+| [flutter_libserialport](https://pub.dev/packages/flutter_libserialport) | Yes | No | Yes | Yes | Yes | 0.6.0, August 2025 |
+| [serial_port_win32](https://pub.dev/packages/serial_port_win32) | No | No | No | No | Yes | 3.0.0, August 2026 |
 
-Choose **skio_usb_serial** for Android, macOS and the web with one API, typed
-errors, line reading and in-app logging. For Windows, Linux and Android
-panels' built-in ports, use `skio_uart`.
+Choose **skio_usb_serial** for Android, macOS, Linux and the web with one
+API, typed errors, line reading and in-app logging. For Windows and
+Android panels' built-in ports, use `skio_uart`.
 
 ## Migrating from usb_serial
 
@@ -547,10 +586,10 @@ Android setup.
 On Android the package calls the phone's USB system and the
 [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android)
 library (MIT) directly from Dart through JNI, with no platform channels and
-no Java code of its own. On macOS it finds ports through IOKit and talks to
-them with POSIX termios, both through `dart:ffi`, reading on a background
-isolate so the UI never waits; there is no native code to compile. On the
-web it uses the browser's Web Serial API.
+no Java code of its own. On macOS it finds ports through IOKit and on Linux
+through sysfs, and on both it talks to them with POSIX termios through
+`dart:ffi`, reading on a background isolate so the UI never waits; there is
+no native code to compile. On the web it uses the browser's Web Serial API.
 All queueing, line reading and error handling is Dart code, covered by unit
 tests.
 
@@ -560,7 +599,7 @@ tests.
 | --- | --- |
 | [`skio_core`](https://pub.dev/packages/skio_core) | Shared types used by all skio packages: permissions, errors, device filters, serial settings, logging |
 | `skio_usb_serial` | USB serial ports (this package) |
-| [`skio_uart`](https://pub.dev/packages/skio_uart) | Serial ports by path: built-in UARTs, COM ports, adapters on Windows and Linux |
+| [`skio_uart`](https://pub.dev/packages/skio_uart) | Serial ports by path: built-in UARTs, Windows COM ports, and adapters on every desktop |
 | [`skio_uvc_camera`](https://pub.dev/packages/skio_uvc_camera) | USB cameras: preview, photos, snapshot button |
 
 ## License
