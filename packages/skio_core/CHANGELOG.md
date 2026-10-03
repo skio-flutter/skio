@@ -1,3 +1,8 @@
+## 0.1.3
+
+- README: `DeviceHandle.id` examples for macOS (`/dev/cu.usbserial-110`),
+  alongside Android. No code changes.
+
 ## 0.1.2
 
 - README badges; clearer pub.dev description and a link to
