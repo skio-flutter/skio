@@ -50,6 +50,7 @@ const TIOCM_DSR = 0x100;
 
 // Terminal ioctls.
 final TIOCEXCL = isLinuxKernel ? 0x540C : 0x2000740d;
+final TIOCNXCL = isLinuxKernel ? 0x540D : 0x2000740e;
 final TIOCMGET = isLinuxKernel ? 0x5415 : 0x4004746a;
 final TIOCMBIS = isLinuxKernel ? 0x5416 : 0x8004746c;
 final TIOCMBIC = isLinuxKernel ? 0x5417 : 0x8004746b;

@@ -98,7 +98,7 @@ final class PosixBackend extends SerialBackend {
       }
       Tty.current.flush(fd, input: true, output: true);
     } catch (_) {
-      LibC.close(fd);
+      _closePort(fd);
       rethrow;
     }
     final connection = _PosixConnection(fd, device, onClosed: onClosed);
@@ -141,6 +141,17 @@ final class PosixBackend extends SerialBackend {
   }
 }
 
+/// Closes a port opened by [PosixBackend].
+///
+/// Exclusive mode is released first: on Linux it belongs to the tty, not
+/// the descriptor, so a tty that outlives this descriptor (a pseudo-terminal,
+/// or a port another process also holds) would otherwise stay locked and
+/// every later open would fail with EBUSY.
+void _closePort(int fd) {
+  LibC.ioctl(fd, TIOCNXCL, nullptr);
+  LibC.close(fd);
+}
+
 void _setSignals(int fd, DeviceHandle device, {bool? dtr, bool? rts}) {
   using((arena) {
     final bits = arena<Int>();
@@ -181,7 +192,7 @@ final class _PosixConnection implements SerialConnection {
     using((arena) {
       final fds = arena<Int>(2);
       if (LibC.pipe(fds) != 0) {
-        LibC.close(_fd);
+        _closePort(_fd);
         onClosed();
         throw ProtocolError(
           'Could not start reading',
@@ -201,9 +212,9 @@ final class _PosixConnection implements SerialConnection {
       ), debugName: 'skio_uart reader');
     } catch (e) {
       _fromReader.close();
-      for (final fd in [_fd, _wakeRead, _wakeWrite]) {
-        LibC.close(fd);
-      }
+      _closePort(_fd);
+      LibC.close(_wakeRead);
+      LibC.close(_wakeWrite);
       onClosed();
       throw ProtocolError('Could not start reading', device: _device, cause: e);
     }
@@ -375,7 +386,7 @@ final class _PosixConnection implements SerialConnection {
       onTimeout: () => _reader?.kill(priority: Isolate.immediate),
     );
     _fromReader.close();
-    LibC.close(_fd);
+    _closePort(_fd);
     LibC.close(_wakeRead);
     LibC.close(_wakeWrite);
     onClosed();
