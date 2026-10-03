@@ -13,7 +13,6 @@ topics:
   - esp32
   - web-serial
   - android
-  - macos
 
 environment:
   sdk: ^3.13.0
