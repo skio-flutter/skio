@@ -101,10 +101,50 @@ packages:
     dependency: transitive
     description:
       name: cross_file
-      sha256: f141ea4f277af142a0356955707f6556f37b03947d39d55585981a06ca437bd6
+      sha256: "3bde17bce71488fc4dc99216da1d990642a726472874dcce4db700eb103d3fa4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5+5"
+    version: "0.4.0"
+  cross_file_android:
+    dependency: transitive
+    description:
+      name: cross_file_android
+      sha256: "7143b2d4451b21aef10a20a651ba99e85b6f73c17c269a23a72fa4a8c2d543dd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  cross_file_darwin:
+    dependency: transitive
+    description:
+      name: cross_file_darwin
+      sha256: "5ae2e0165199c4dd09bd2a21733817b6fda390692ad6bf3ffd69be2bb9c37330"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  cross_file_io:
+    dependency: transitive
+    description:
+      name: cross_file_io
+      sha256: b8d6af657ed47860d603130e2908f76c062c13b4764fd0ae3190243c55c396bc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  cross_file_platform_interface:
+    dependency: transitive
+    description:
+      name: cross_file_platform_interface
+      sha256: "6f8fd6dc53835107ca38f7f2226985b7730c26bb8dedc313de19ed6a68feac84"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  cross_file_web:
+    dependency: transitive
+    description:
+      name: cross_file_web
+      sha256: de01eb6f6bec735f3e501770cceb89638cd50298ef5dd1a58aa04b4c254b3f85
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   crypto:
     dependency: transitive
     description:
@@ -220,10 +260,10 @@ packages:
     dependency: transitive
     description:
       name: jni
-      sha256: f038e58b4dc2c9037f50e233175086337e0b305e356d28211bf55f21c504cbd3
+      sha256: "6b9ca0602fef0230e83149afbe3f9f8227e94f2bbe84a1da4f14d699742f402d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.3"
+    version: "1.1.0"
   jni_flutter:
     dependency: transitive
     description:
@@ -244,10 +284,10 @@ packages:
     dependency: transitive
     description:
       name: jnigen
-      sha256: ad5f2aeb5e7fc83643c55adf7a1056748e49687e6d4edaee4b8c360a8fa7870f
+      sha256: "2055cf3b8a9e800af37f1ede3e9f86c02695f7bbb4f3bed3eab0457c14b75580"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   json_annotation:
     dependency: transitive
     description:
