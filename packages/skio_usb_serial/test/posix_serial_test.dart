@@ -1,35 +1,46 @@
-// Runs the macOS backend against a pseudo-terminal pair, which behaves like a
-// serial port without any hardware attached.
-@TestOn('mac-os')
+// Runs the macOS or Linux backend against a pseudo-terminal pair, which
+// behaves like a serial port without any hardware attached.
+@TestOn('mac-os || linux')
 library;
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io' show Platform;
 import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:skio_usb_serial/skio_usb_serial.dart';
-import 'package:skio_usb_serial/src/macos/posix.dart';
+import 'package:skio_usb_serial/src/linux/usb_serial_linux.dart';
 import 'package:skio_usb_serial/src/macos/usb_serial_macos.dart';
+import 'package:skio_usb_serial/src/platform/usb_serial_platform.dart';
+import 'package:skio_usb_serial/src/posix/libc.dart';
 
-final _openpty = DynamicLibrary.process()
-    .lookupFunction<
-      Int Function(Pointer<Int>, Pointer<Int>, Pointer<Utf8>, Pointer, Pointer),
-      int Function(Pointer<Int>, Pointer<Int>, Pointer<Utf8>, Pointer, Pointer)
-    >('openpty');
+final _lib = DynamicLibrary.process();
+final _posixOpenpt = _lib.lookupFunction<Int Function(Int), int Function(int)>(
+  'posix_openpt',
+);
+final _grantpt = _lib.lookupFunction<Int Function(Int), int Function(int)>(
+  'grantpt',
+);
+final _unlockpt = _lib.lookupFunction<Int Function(Int), int Function(int)>(
+  'unlockpt',
+);
+final _ptsname = _lib
+    .lookupFunction<Pointer<Utf8> Function(Int), Pointer<Utf8> Function(int)>(
+      'ptsname',
+    );
 
-/// Opens a pty and returns the master fd and the slave's path.
-(int, String) _openPty() => using((arena) {
-  final master = arena<Int>();
-  final slave = arena<Int>();
-  final name = arena<Uint8>(128).cast<Utf8>();
-  expect(_openpty(master, slave, name, nullptr, nullptr), 0);
-  // The backend opens the slave by path; this copy isn't needed.
-  LibC.close(slave.value);
-  return (master.value, name.toDartString());
-});
+/// Opens a pty and returns the master fd and the slave's path. These calls
+/// are in libc on both macOS and Linux, unlike openpty.
+(int, String) _openPty() {
+  final master = _posixOpenpt(Sys.O_RDWR | Sys.O_NOCTTY);
+  expect(master, greaterThanOrEqualTo(0));
+  expect(_grantpt(master), 0);
+  expect(_unlockpt(master), 0);
+  return (master, _ptsname(master).toDartString());
+}
 
 void _writeMaster(int fd, List<int> bytes) => using((arena) {
   final buffer = arena<Uint8>(bytes.length)
@@ -62,12 +73,14 @@ Future<List<int>> _readMaster(int fd, int count) async {
 }
 
 void main() {
-  late MacosUsbSerialPlatform platform;
+  late UsbSerialPlatform platform;
   late int master;
   late DeviceHandle device;
 
   setUp(() {
-    platform = MacosUsbSerialPlatform();
+    platform = Platform.isMacOS
+        ? MacosUsbSerialPlatform()
+        : LinuxUsbSerialPlatform();
     final (fd, path) = _openPty();
     master = fd;
     device = DeviceHandle(id: path);
@@ -77,14 +90,16 @@ void main() {
 
   test('list returns only USB ports', () async {
     for (final port in await platform.list()) {
-      expect(port.id, startsWith('/dev/cu.'));
+      expect(port.id, startsWith(Platform.isMacOS ? '/dev/cu.' : '/dev/tty'));
       expect(port.vendorId, isNotNull);
     }
   });
 
-  test('access is not required', () async {
+  test('access needs no prompt', () async {
     expect((await platform.checkAccess()).status, AccessStatus.notRequired);
     expect(platform.requiresUserSelection, isFalse);
+    // Linux checks the device node's permissions; the pty is ours.
+    expect((await platform.checkAccess(device)).isUsable, isTrue);
   });
 
   test('reads and writes', () async {
@@ -122,20 +137,30 @@ void main() {
   });
 
   test('applies line settings', () async {
-    for (final config in const [
-      SerialConfig(baudRate: 9600, dataBits: 7, parity: Parity.even),
-      SerialConfig(baudRate: 57600, stopBits: StopBits.two),
-      SerialConfig(baudRate: 19200, flowControl: FlowControl.xonXoff),
+    for (final config in [
+      const SerialConfig(baudRate: 9600, dataBits: 7, parity: Parity.even),
+      const SerialConfig(baudRate: 57600, stopBits: StopBits.two),
+      const SerialConfig(baudRate: 19200, flowControl: FlowControl.xonXoff),
+      const SerialConfig(baudRate: 115200, flowControl: FlowControl.rtsCts),
+      // Linux supports these through CMSPAR and BOTHER.
+      if (Platform.isLinux) ...[
+        const SerialConfig(baudRate: 9600, parity: Parity.mark),
+        const SerialConfig(baudRate: 9600, parity: Parity.space),
+        const SerialConfig(baudRate: 250000),
+      ],
     ]) {
       final connection = await platform.open(device, config);
       await connection.close();
     }
   });
 
-  test('rejects settings macOS lacks', () async {
-    for (final config in const [
-      SerialConfig(baudRate: 9600, parity: Parity.mark),
-      SerialConfig(baudRate: 9600, stopBits: StopBits.onePointFive),
+  test('rejects settings the system lacks', () async {
+    for (final config in [
+      if (Platform.isMacOS)
+        const SerialConfig(baudRate: 9600, parity: Parity.mark),
+      if (Platform.isLinux)
+        const SerialConfig(baudRate: 9600, flowControl: FlowControl.dtrDsr),
+      const SerialConfig(baudRate: 9600, stopBits: StopBits.onePointFive),
     ]) {
       await expectLater(
         platform.open(device, config),

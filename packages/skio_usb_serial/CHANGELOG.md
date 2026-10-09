@@ -1,3 +1,19 @@
+## 0.3.0
+
+- **Linux support** (x86_64 and arm64). Lists USB serial ports from sysfs
+  (with vendor, product and serial number; built-in `ttyS*` UARTs are left
+  out) and opens them with termios2 through `dart:ffi`. Any baud rate, 5 to
+  8 data bits, every parity including mark and space, 1 or 2 stop bits,
+  RTS/CTS and XON/XOFF flow control, DTR/RTS lines, plug and unplug events.
+  `checkAccess(device)` reports whether the user can open the port, with a
+  hint about the `dialout` group. The same code as on Android and macOS
+  works unchanged.
+- macOS and Linux now share one POSIX backend (open, background reader,
+  non-blocking writes, DTR/RTS, exclusive access). Closing a port now also
+  clears exclusive mode, which Linux would otherwise keep on a tty that
+  something else still holds open.
+- Example: runs on Linux, with a `dialout` hint.
+
 ## 0.2.1
 
 - `SerialConfig`, `Parity`, `StopBits`, `FlowControl` and `LineReader` now
