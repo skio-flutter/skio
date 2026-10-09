@@ -1,3 +1,18 @@
+## 0.3.0-beta.1
+
+- **Windows support (beta).** Lists USB COM ports through the SetupAPI,
+  with vendor, product and serial number (also for FTDI's own driver and
+  for composite boards such as ESP32-S3 and RP2040); built-in and Bluetooth
+  COM ports are left out. `device.id` is the port name (`COM3`) and
+  `device.name` is what Device Manager shows. Ports open with overlapped
+  I/O through kernel32, all through `dart:ffi`: no C++ plugin code. Every
+  `SerialConfig` setting the driver accepts, DTR/RTS lines, plug and
+  unplug events. Reading runs on a background isolate; writes never block
+  the UI. A port another program holds throws `DeviceBusy`.
+- The Windows port I/O follows skio_uart's tested Windows backend.
+- Example: runs on Windows, with Windows hints.
+- Not yet tested with real adapters on Windows; reports are welcome.
+
 ## 0.2.1
 
 - `SerialConfig`, `Parity`, `StopBits`, `FlowControl` and `LineReader` now
