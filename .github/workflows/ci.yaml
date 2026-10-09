@@ -14,7 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
+  # Format, analysis, tests and publish dry-runs for every package.
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -50,13 +51,68 @@ jobs:
             echo "::endgroup::"
           done
 
+      - name: Publish dry-run
+        run: |
+          for pkg in packages/*/; do
+            echo "::group::dry-run $pkg"
+            (cd "$pkg" && flutter pub publish --dry-run)
+            echo "::endgroup::"
+          done
+
+  # One Android release build per example, side by side. Gradle's downloads
+  # are cached (written from main, read by pull requests).
+  android:
+    name: android (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [skio_usb_serial, skio_uart, skio_uvc_camera]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          cache-provider: basic
+          add-job-summary: never
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve workspace
+        run: flutter pub get
+
+      - name: Build example (Android release)
+        working-directory: packages/${{ matrix.package }}/example
+        run: flutter build apk --release
+
+  # Web and Linux builds of the examples.
+  web-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve workspace
+        run: flutter pub get
+
       - name: Build serial example (web)
         working-directory: packages/skio_usb_serial/example
         run: flutter build web --release
 
-      - name: Build serial example (Android release)
-        working-directory: packages/skio_usb_serial/example
-        run: flutter build apk --release
+      - name: Build camera example (web)
+        working-directory: packages/skio_uvc_camera/example
+        run: flutter build web --release
 
       - name: Install Linux desktop build dependencies
         run: |
@@ -67,28 +123,24 @@ jobs:
         working-directory: packages/skio_uart/example
         run: flutter build linux --release
 
-      - name: Build UART example (Android release)
-        working-directory: packages/skio_uart/example
-        run: flutter build apk --release
-
-      - name: Build camera example (web)
-        working-directory: packages/skio_uvc_camera/example
-        run: flutter build web --release
-
-      - name: Build camera example (Android release)
-        working-directory: packages/skio_uvc_camera/example
-        run: flutter build apk --release
-
-      - name: Publish dry-run
+  # The check branch protection requires. It passes only when every job
+  # above passed, so the jobs can run in parallel without changing the rule.
+  ci:
+    if: always()
+    needs: [checks, android, web-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All jobs passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
-          for pkg in packages/*/; do
-            echo "::group::dry-run $pkg"
-            (cd "$pkg" && flutter pub publish --dry-run)
-            echo "::endgroup::"
+          echo "Results: $RESULTS"
+          for result in $RESULTS; do
+            [ "$result" = success ] || exit 1
           done
 
   # The macOS serial backends are tested against pseudo-terminals, which
-  # need a Mac. (The Linux ones run in the ci job above.)
+  # need a Mac. (The Linux ones run in the checks job above.)
   macos:
     runs-on: macos-latest
     steps:
