@@ -1,5 +1,5 @@
-/// USB serial ports for Flutter on Android (USB OTG), macOS and the web (Web
-/// Serial).
+/// USB serial ports for Flutter on Android (USB OTG), macOS, Windows and the
+/// web (Web Serial).
 ///
 /// Start with [UsbSerialPort.list] (or [UsbSerialPort.request] on the web),
 /// then [UsbSerialPort.open].

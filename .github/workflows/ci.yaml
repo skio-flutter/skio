@@ -188,6 +188,14 @@ jobs:
       - name: Resolve workspace
         run: flutter pub get
 
+      - name: Test serial (Windows)
+        working-directory: packages/skio_usb_serial
+        run: flutter test
+
+      - name: Build serial example (Windows)
+        working-directory: packages/skio_usb_serial/example
+        run: flutter build windows --debug
+
       - name: Test UART (Windows)
         working-directory: packages/skio_uart
         run: dart test
