@@ -44,7 +44,7 @@ hardware plugins.
 
 ## Platforms
 
-| Feature | Android | macOS | Windows (beta) | Web (Chrome, Edge) |
+| Feature | Android | macOS | Windows | Web (Chrome, Edge) |
 | --- | --- | --- | --- | --- |
 | How it connects | USB host (OTG) cable or adapter | The `/dev/cu.*` port macOS creates for the adapter | The COM port Windows creates for the adapter | Web Serial API |
 | Finding ports | Lists every attached adapter | Lists every attached USB serial port, with vendor, product and serial number | Lists every attached USB COM port, with vendor, product and serial number | The user picks a port in a browser popup; picked ports are remembered |
@@ -424,8 +424,6 @@ and your debug log.
 
 - Android, macOS, Windows and web only. For Linux and the UARTs built into
   Android panels, use [`skio_uart`](https://pub.dev/packages/skio_uart).
-- Windows support is a beta: it is covered by automated tests on Windows,
-  but has not been tested with real adapters yet. Reports are very welcome.
 - On Android, macOS and Windows, plug and unplug events are checked once a
   second.
 - macOS has no mark or space parity and no 1.5 stop bits; these throw
@@ -481,7 +479,7 @@ Yes, from 0.2.0, with the same code as on Android. Sandboxed apps need the
 `com.apple.security.device.serial` entitlement (see [Install](#install)).
 
 **Does it work on Windows?**
-Yes, as a beta from 0.3.0-beta.1, with the same code as on Android. Ports
+Yes, from 0.3.0, with the same code as on Android. Ports
 are listed with their USB IDs and opened by name, such as `COM3`. Nothing
 needs to be set up.
 
@@ -518,7 +516,7 @@ A fair summary to help you choose (versions as of September 2026):
 
 | Package | Android | Web | macOS | Windows | Linux | Latest release |
 | --- | --- | --- | --- | --- | --- | --- |
-| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Yes | Yes (beta) | Use skio_uart | 2026 |
+| **skio_usb_serial** | Yes (USB OTG) | Yes (Web Serial) | Yes | Yes | Use skio_uart | 2026 |
 | [skio_uart](https://pub.dev/packages/skio_uart) | Built-in UARTs | No | Yes | Yes | Yes | 2026 |
 | [usb_serial](https://pub.dev/packages/usb_serial) | Yes | No | No | No | No | 0.5.2, July 2024 |
 | [flutter_libserialport](https://pub.dev/packages/flutter_libserialport) | Yes | No | Yes | Yes | Yes | 0.6.0, August 2025 |
