@@ -28,6 +28,7 @@ jobs:
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
+          flutter-version: 3.47.x
           cache: true
 
       - name: Resolve workspace
@@ -81,6 +82,7 @@ jobs:
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
+          flutter-version: 3.47.x
           cache: true
 
       - name: Resolve workspace
@@ -101,6 +103,7 @@ jobs:
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
+          flutter-version: 3.47.x
           cache: true
 
       - name: Resolve workspace
@@ -151,6 +154,7 @@ jobs:
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
+          flutter-version: 3.47.x
           cache: true
 
       - name: Resolve workspace
@@ -183,10 +187,32 @@ jobs:
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
+          flutter-version: 3.47.x
           cache: true
 
       - name: Resolve workspace
         run: flutter pub get
+
+      - name: Test serial (Windows)
+        working-directory: packages/skio_usb_serial
+        run: flutter test
+
+      - name: Build serial example (Windows)
+        working-directory: packages/skio_usb_serial/example
+        run: flutter build windows --debug
+
+      # A release build runs on machines without the Visual Studio debug
+      # runtime, so it can be downloaded and tried on real hardware.
+      - name: Build serial example (Windows release)
+        working-directory: packages/skio_usb_serial/example
+        run: flutter build windows --release
+
+      - name: Upload serial example (Windows)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: skio_usb_serial_example_windows
+          path: packages/skio_usb_serial/example/build/windows/x64/runner/Release
+          retention-days: 14
 
       - name: Test UART (Windows)
         working-directory: packages/skio_uart
