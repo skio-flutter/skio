@@ -26,10 +26,10 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   ffi: ^2.1.0
-  jni: ^1.0.3
-  jni_flutter: ^1.0.3
+  jni: ^1.2.1
+  jni_flutter: ^1.1.0
   skio_core: ^0.2.0
-  web: ^1.1.1
+  web: ^1.1.2
 
 flutter:
   plugin:
